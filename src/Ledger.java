@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Ledger {
 /*
@@ -26,8 +28,46 @@ Example Transaction:
 		}
 		blockchain.add(e);
 	}
-	public double calcBalance(String userkey){
-		//TODO
+	public double calcBalance(String username){
+		
+		for(Entry e : blockchain) {
+			int sum = 0;
+			List<String> outputs = e.getOutputNames();
+			Set<Vout> unspent = new HashSet<Vout>();
+			for(int i=0; i< outputs.size(); i++) {
+			if(outputs.get(i).equals(username)) { //We found one output of this transaction.
+				Vout temp = new Vout(e.getId(), e.getOutputAmounts().get(i), i);
+				unspent.add(temp);
+				sum+= e.getOutputAmounts().get(i);
+			}
+			}
+		}//Locate all vout relations (amount, transID, inputIndex) WHERE name=name 
+		
+		
+		//Subtract them from the set when they are used.
+		for(Entry e : blockchain.getIds) {
+			//TODO fix this.
+			if(unspent.contains(e.getInputIDs())) {
+				//spends from this transaction
+				for() {//every possible index
+					if() {//match{
+						
+					}
+						
+				}
+			}
+				
+		}
+		
+		
+		//Iterate across the remaining set and sum the balance.
+		
+		//Return this value and drop the refs with a gc.
+		return 0;
+		
+		//TODO Return all of the vouts minus the cases where those are used as inputs (index and id both match)
+		
+		
 	}
 	
 	public String toString() {

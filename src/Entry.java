@@ -39,11 +39,11 @@ public class Entry {
 		return ret;
 	}
 
-	private List<Integer> getOutputAmounts() {
+	public List<Integer> getOutputAmounts() {
 		return outputAmounts;
 	}
 
-	private List<String> getInputIDs() {
+	public List<String> getInputIDs() {
 		return inputIDs;
 	}
 
@@ -54,6 +54,10 @@ public class Entry {
 	public int sumOfOuts() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	public List<String> getOutputNames() {
+		return outputNames;
 	}
 
 }
