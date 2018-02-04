@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 
 public class Ledger {
 /*
@@ -9,8 +11,33 @@ Example Transaction:
 4787df35; 1;(f2cea539, 0);3; (Bob, 150)(Alice, 845)(Gopesh, 5)
  */
 	private boolean isInteractive, isVerbose;
-	public String toString() {
+	public List<Entry> getBlockchain() {
+		return blockchain;
+	}
+	private List<Entry> blockchain;
+	public Ledger(Entry genesis) {
+		blockchain = new ArrayList<Entry>();
+		blockchain.add(genesis);
+	}
+	public void addTx(Entry e) {
+		if(e.sumOfIns() != e.sumOfOuts()) {
+			System.out.println("Invalid transaction sum");
+			return;
+		}
+		blockchain.add(e);
+	}
+	public double calcBalance(String userkey){
 		//TODO
+	}
+	
+	public String toString() {
+		String ret = "";
+		for(Entry e : blockchain) {
+			ret+=e;
+			ret+="\n";
+		}
+		return ret.trim();
+		
 	}
 	public boolean isVerbose() {
 		return isVerbose;
@@ -24,4 +51,5 @@ Example Transaction:
 	public void setInteractive(boolean isInteractive) {
 		this.isInteractive = isInteractive;
 	}
+	
 }
