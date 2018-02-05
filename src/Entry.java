@@ -68,7 +68,7 @@ public class Entry {
 		return outputs;
 	}
 
-	public List<Inputs> getInputs() {
+	public List<Input> getInputs() {
 		return inputs;
 	}
 

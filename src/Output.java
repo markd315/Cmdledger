@@ -2,11 +2,16 @@
 public class Output {
 	private String name;
 	private int amount;
+	private String id;
 
-	public Output(String name, int amount) {
-		super();
+	public Output(String name, int amount, Entry entry) {
 		this.name = name;
 		this.amount = amount;
+		this.id = entry.getId();
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	public String getName() {

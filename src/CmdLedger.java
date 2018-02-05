@@ -22,7 +22,7 @@ public class CmdLedger {
 	}
 	public static void main(String[] args) {
 		Entry genesis = new Entry();
-		Output op = new Output("Alice", 5000);
+		Output op = new Output("Alice", 5000, genesis);
 		genesis.setSingleGenesis(op);
 		Ledger session = new Ledger(genesis);
 		Scanner in = new Scanner(System.in);
@@ -37,7 +37,8 @@ public class CmdLedger {
 			}//Print ledger
 			if(cmd.equalsIgnoreCase("w")) {
 				genesis = new Entry();
-				genesis.setSingleGenesis(5000, "Alice");
+				Output o = new Output("Alice", 5000, genesis);
+				genesis.setSingleGenesis(o);
 				session = new Ledger(genesis);
 				System.gc();
 			}

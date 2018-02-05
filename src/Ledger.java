@@ -36,51 +36,63 @@ public class Ledger {
 		blockchain.add(e);
 	}
 
-	public double calcBalance(String username){
-		Set<Vout> unspent = new HashSet<Vout>();
-		for(Entry e : blockchain) {
-			int sum = 0;
-			List<String> outputs = e.getOutputNames();
-			for(int i=0; i< outputs.size(); i++) {
-			if(outputs.get(i).equals(username)) { //We found one output of this transaction.
-				Vout temp = new Vout(e.getId(), e.getOutputAmounts().get(i), i);
-				unspent.add(temp);
-				sum+= e.getOutputAmounts().get(i);
+	public double calcBalance(String username) throws Exception {
+		Set<Output> unspent = new HashSet<Output>();
+		for (Entry e : blockchain) {
+			List<Output> outputs = e.getOutputs();
+			for (int i = 0; i < outputs.size(); i++) {
+				if (outputs.get(i).equals(username)) { // We found one output of this transaction.
+					Output temp = outputs.get(i);
+					unspent.add(temp);
+				}
 			}
-			}
-		}//Locate all vout relations (amount, transID, inputIndex) WHERE name=name 
-		
-		
-		//Subtract them from the set when they are used.
-		for(Entry e : blockchain) {
-			for(Vout output : unspent) {
-				if(e.getInputIDs().equals(output.getId()) && e.getInputIndices().get(output.getIndex())) {//Match the 
+		} // Locate all vout relations (amount, transID, inputIndex) WHERE name=name
+
+		// SAVE THE INDEX. SAVE THE TXID FROM THIS NAME SEARCH.
+		// CHECK THE TXID for ALL TRANSACTIONS.
+		// DOES THE UNSPENT SET CONTAIN THIS TXID?
+		// Yes? CHECK ALL INPUTS FOR THIS TRANSACTION.
+		// Does the output index location from the output list match the input.index?
+		// MATCHES? REMOVE IT FROM THE UNSPENT SET.
+		for (int i = 0; i < blockchain.size(); i++) {
+			Entry e = blockchain.get(i);
+			for (Output op : unspent) { // Does the unspent set contain this txid?
+				if(op.getId().equals(e.getId())) {//Yes?
+					for(Input in : e.getInputs()) {
+						int index = in.getIndex();
+						//TODO how do I find the output index location?
+						int outputIndexLocation = lookupOutput(op);
+						if(index == outputIndexLocation) {
+							unspent.remove(op);
+						}
+					}
 					
 				}
 			}
-			
-			/*if(unspentcontains()) {
-				//spends from this transaction
-				for() {//every possible index
-					if() {//match{
-						
-					}
-						
-				}
-			}*/
-			
-				
 		}
-		
-		
-		//Iterate across the remaining set and sum the balance.
-		
-		//Return this value and drop the refs with a gc.
-		return 0;
-		
-		//TODO Return all of the vouts minus the cases where those are used as inputs (index and id both match)
-		
-		
+		// Iterate across the remaining set and sum the balance.
+		int sum =0;
+		for(Output o : unspent) {
+			sum+=o.getAmount();
+		}
+		// Return this value and drop the refs with a gc.
+		System.gc();
+		return sum;
+
+		// TODO Return all of the vouts minus the cases where those are used as inputs
+		// (index and id both match)
+
+	}
+
+	private int lookupOutput(Output op) throws Exception {
+		for(Entry e : this.blockchain) {
+			for(int i=0; i<e.getOutputs().size(); i++) {
+				if(op.equals(e.getOutputs().get(i))) {
+					return i;
+				}
+			}
+		}
+		throw new Exception("Unable to find output");
 	}
 
 	public String toString() {

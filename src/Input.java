@@ -4,7 +4,6 @@ public class Input {
 	private int index;
 
 	public Input(String id, int index) {
-		super();
 		this.id = id;
 		this.index = index;
 	}
