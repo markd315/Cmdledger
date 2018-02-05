@@ -21,7 +21,7 @@ public class CmdLedger {
 		return importer;
 	}
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args){
 		Entry genesis = new Entry();
 		Output op = new Output("Alice", 5000, genesis);
 		genesis.setSingleGenesis(op);
@@ -74,16 +74,24 @@ public class CmdLedger {
 			String remainingCmd = cmd.substring(1).trim();//Drop first char and any whitespace.
 			switch (firstChar) {
 			case 'f':
-				loadFromFile(remainingCmd);
+				try {
+					loadFromFile(session, remainingCmd);
+				} catch (FileNotFoundException e) {
+					System.err.println("File Not Found.");
+				}
 				break;
 			case 't':
-				addTransaction(remainingCmd);
+					session.addTransaction(remainingCmd);
 				break;
 			case 'b':
-				System.out.println(session.calcBalance(remainingCmd));
+				try {
+					System.out.println(session.calcBalance(remainingCmd));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				break;
 			case 'd':
-				dumpFile(remainingCmd);
+				dumpFile(session, remainingCmd);
 				break;
 			}
 

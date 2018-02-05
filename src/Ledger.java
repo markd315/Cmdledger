@@ -36,7 +36,7 @@ public class Ledger {
 		blockchain.add(e);
 	}
 
-	public double calcBalance(String username) throws Exception {
+	public double calcBalance(String username) throws Exception{
 		Set<Output> unspent = new HashSet<Output>();
 		for (Entry e : blockchain) {
 			List<Output> outputs = e.getOutputs();
@@ -57,42 +57,38 @@ public class Ledger {
 		for (int i = 0; i < blockchain.size(); i++) {
 			Entry e = blockchain.get(i);
 			for (Output op : unspent) { // Does the unspent set contain this txid?
-				if(op.getId().equals(e.getId())) {//Yes?
-					for(Input in : e.getInputs()) {
+				if (op.getId().equals(e.getId())) {// Yes?
+					for (Input in : e.getInputs()) {
 						int index = in.getIndex();
-						//TODO how do I find the output index location?
+						// TODO how do I find the output index location?
 						int outputIndexLocation = lookupOutput(op);
-						if(index == outputIndexLocation) {
+						if (index == outputIndexLocation) {
 							unspent.remove(op);
 						}
 					}
-					
+
 				}
 			}
 		}
 		// Iterate across the remaining set and sum the balance.
-		int sum =0;
-		for(Output o : unspent) {
-			sum+=o.getAmount();
+		int sum = 0;
+		for (Output o : unspent) {
+			sum += o.getAmount();
 		}
 		// Return this value and drop the refs with a gc.
 		System.gc();
 		return sum;
-
-		// TODO Return all of the vouts minus the cases where those are used as inputs
-		// (index and id both match)
-
 	}
 
-	private int lookupOutput(Output op) throws Exception {
-		for(Entry e : this.blockchain) {
-			for(int i=0; i<e.getOutputs().size(); i++) {
-				if(op.equals(e.getOutputs().get(i))) {
+	private int lookupOutput(Output op) throws Exception{
+		for (Entry e : this.blockchain) {
+			for (int i = 0; i < e.getOutputs().size(); i++) {
+				if (op.equals(e.getOutputs().get(i))) {
 					return i;
 				}
 			}
 		}
-		throw new Exception("Unable to find output");
+		throw new Exception("Couldn't find output");
 	}
 
 	public String toString() {
@@ -121,11 +117,32 @@ public class Ledger {
 		this.isInteractive = isInteractive;
 	}
 
-	//This needs to handle geneses and check them to see if they are the first transaction.
-	//Exception for vin!=vout && not genesis.
-	public void addTransaction(String remainingCmd) {
-		// TODO Auto-generated method stub
+	// This needs to handle geneses and check them to see if they are the first
+	// transaction.
+	// Exception for vin!=vout && not genesis.
+	public void addTransaction(String remainingCmd){
+		// TODO Construct an E to add.
 		
+		this.addTransaction(e);
+		return;
+	}
+
+	// This needs to handle geneses and check them to see if they are the first
+	// transaction.
+	// Exception for vin!=vout && not genesis.
+	public void addTransaction(Entry e) {
+		// Verify sanity.
+		if (e.sumOfIns() == 0) {
+			System.out.print("Transaction rejected, reason: ");
+			System.err.println("Empty input space");
+		} else if (e.sumOfOuts() == 0) {
+			System.out.print("Transaction rejected, reason: ");
+			System.err.println("Empty output space.");
+		} else if (e.sumOfIns() != e.sumOfOuts() && blockchain.size() > 0) {
+			System.out.print("Transaction rejected, reason: ");
+			System.err.println("Invalid spend or destruct of funds.");
+		} else
+			blockchain.add(e);
 	}
 
 }

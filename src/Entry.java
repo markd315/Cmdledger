@@ -33,6 +33,11 @@ public class Entry {
 			this.outputs.add(o);
 	}
 
+	public Entry() {
+		//We must call a genesis set on this constructor or add valid inputs or outputs for it to be accepted.
+		
+	}
+
 	public void setParentLedger(Ledger l) {
 		this.parentLedger = l;
 	}
