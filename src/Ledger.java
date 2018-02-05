@@ -37,6 +37,14 @@ public class Ledger {
 	}
 
 	public double calcBalance(String username) throws Exception {
+		/* TODO
+		FAILING CASE
+		root; 0; ; 1; (Alice, 5000)
+		newt; 1; (root, 0); 2; (Sam, 2000)(Bob, 3000)
+		newtt; 1; (newt, 0); 2; (Bob, 1000)(Brock, 1000)
+		
+		SHOWS Sam having 2000, expected 0.
+		*/
 		Set<Output> unspent = new HashSet<Output>();
 		for (Entry e : blockchain) {
 			List<Output> outputs = e.getOutputs();
@@ -189,8 +197,8 @@ public class Ledger {
 			}
 		}
 		//TODO FIX check for output doublespends
-		for(Output op : e.getOutputs()) {
-			if(isSpentInAnyTransaction(op)) {
+		for(Input in : e.getInputs()) {
+			if(isSpentInAnyTransaction(lookupOutput(in))){
 				System.err.println("Duplicate spend");
 				return;
 			}
@@ -207,6 +215,15 @@ public class Ledger {
 			System.err.println("Invalid spend or destruct of funds.");
 		} else
 			blockchain.add(e);
+	}
+
+	private Output lookupOutput(Input in) {
+		for(Entry e : this.blockchain) {
+			if(e.getId().equals(in.getId())) {
+				return e.getOutputs().get(in.getIndex());
+			}
+		}
+		return null;
 	}
 
 }
