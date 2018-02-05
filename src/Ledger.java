@@ -140,7 +140,7 @@ public class Ledger {
 			inputArray = new String[1];
 			inputArray[0] = withoutParentheses;
 		}
-		//TESTCMD: t newt; 2; (root, 0)(root, 1); 2; (Sam, 2000)(Bob, 3000)
+		//TESTCMD: t newt; 1; (root, 0); 2; (Sam, 2000)(Bob, 3000)
 		//We want to remove the leading ( to be able to split this string.
 		for (String s : inputArray) {
 			String[] inSplit = s.split(",");
@@ -150,6 +150,7 @@ public class Ledger {
 		}
 		if(ins.size() != inputSize) {
 			System.err.println("Invalid inputs!");
+			return;
 		}
 
 		int outputSize = Integer.parseInt(split[3]);
@@ -174,6 +175,7 @@ public class Ledger {
 		}
 		if(outs.size() != outputSize) {
 			System.err.println("Invalid outputs!");
+			return;
 		}
 		Entry e = new Entry(this, ins, outs);
 		for(Output o : e.getOutputs()) {
