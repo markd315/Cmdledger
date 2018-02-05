@@ -47,26 +47,16 @@ public class Ledger {
 				}
 			}
 		} // Locate all vout relations (amount, transID, inputIndex) WHERE name=name
-		//TODO additive balance is working, subtractive is NOT.
-		// SAVE THE INDEX. SAVE THE TXID FROM THIS NAME SEARCH.
-		// CHECK THE TXID for ALL TRANSACTIONS.
-		// DOES THE UNSPENT SET CONTAIN THIS TXID?
-		// Yes? CHECK ALL INPUTS FOR THIS TRANSACTION.
-		// Does the output index location from the output list match the input.index?
-		// MATCHES? REMOVE IT FROM THE UNSPENT SET.
-		for (int i = 0; i < blockchain.size(); i++) {
-			Entry e = blockchain.get(i);
-			for (Output op : unspent) { // Does the unspent set contain this txid?
-				if (op.getId().equals(e.getId())) {// Yes?
-					for (Input in : e.getInputs()) {
-						int index = in.getIndex();
-						int outputIndexLocation = lookupOutput(op);
-						if (index == outputIndexLocation) {
-							unspent.remove(op);
-						}
-					}
-
-				}
+			// SAVE THE INDEX. SAVE THE TXID FROM THIS NAME SEARCH.
+			// CHECK THE TXID for ALL TRANSACTIONS.
+			// DOES THE UNSPENT SET CONTAIN THIS TXID?
+			// Yes? CHECK ALL INPUTS FOR THIS TRANSACTION.
+			// Does the output index location from the output list match the input.index?
+			// MATCHES? REMOVE IT FROM THE UNSPENT SET.
+		for (Output op : unspent) { // Does the unspent set contain this txid?
+			// e.getInputs is empty. We need to grab the OUTPUTS of e and INPUTS of the op
+			if (isSpentInAnyTransaction(op)) {
+				unspent.remove(op);
 			}
 		}
 		// Iterate across the remaining set and sum the balance.
@@ -79,15 +69,15 @@ public class Ledger {
 		return sum;
 	}
 
-	private int lookupOutput(Output op) throws Exception {
+	private boolean isSpentInAnyTransaction(Output op) {
 		for (Entry e : this.blockchain) {
-			for (int i = 0; i < e.getOutputs().size(); i++) {
-				if (op.equals(e.getOutputs().get(i))) {
-					return i;
+			for (Input in : e.getInputs()) {
+				if (in.getId().equals(op.getId()) && in.getIndex() == op.indexInChain(this)) {
+					return true;
 				}
 			}
 		}
-		throw new Exception("Couldn't find output");
+		return false;
 	}
 
 	public String toString() {
@@ -128,57 +118,57 @@ public class Ledger {
 			split[i] = split[i].trim();
 		}
 		int inputSize = Integer.parseInt(split[1]);
-		List<Input> ins=  new ArrayList<Input>();
+		List<Input> ins = new ArrayList<Input>();
 		String temp = split[2].substring(1, split[2].length() - 1);
-		String withoutParentheses = temp.replaceAll("\\)",";");
-		withoutParentheses = withoutParentheses.replaceAll("\\(","");
+		String withoutParentheses = temp.replaceAll("\\)", ";");
+		withoutParentheses = withoutParentheses.replaceAll("\\(", "");
 		String[] inputArray = {};
-		
-		if(withoutParentheses.contains(";")){
+
+		if (withoutParentheses.contains(";")) {
 			inputArray = withoutParentheses.split(";");
-		}else {
+		} else {
 			inputArray = new String[1];
 			inputArray[0] = withoutParentheses;
 		}
-		//TESTCMD: t newt; 1; (root, 0); 2; (Sam, 2000)(Bob, 3000)
-		//We want to remove the leading ( to be able to split this string.
+		// TESTCMD: t newt; 1; (root, 0); 2; (Sam, 2000)(Bob, 3000)
+		// We want to remove the leading ( to be able to split this string.
 		for (String s : inputArray) {
 			String[] inSplit = s.split(",");
 			String txid = inSplit[0].trim();
-			int index = Integer.parseInt(inSplit[1].trim()); 
+			int index = Integer.parseInt(inSplit[1].trim());
 			ins.add(new Input(txid, index));
 		}
-		if(ins.size() != inputSize) {
+		if (ins.size() != inputSize) {
 			System.err.println("Invalid inputs!");
 			return;
 		}
 
 		int outputSize = Integer.parseInt(split[3]);
-		List<Output> outs=  new ArrayList<Output>();
+		List<Output> outs = new ArrayList<Output>();
 		String[] outputArray = {};
 		temp = split[4].substring(1, split[4].length() - 1);
-		withoutParentheses = temp.replaceAll("\\)",";");
-		withoutParentheses = withoutParentheses.replaceAll("\\(","");
-		
-		if(withoutParentheses.contains(";")){
+		withoutParentheses = temp.replaceAll("\\)", ";");
+		withoutParentheses = withoutParentheses.replaceAll("\\(", "");
+
+		if (withoutParentheses.contains(";")) {
 			outputArray = withoutParentheses.split(";");
-		}else {
+		} else {
 			outputArray = new String[1];
 			outputArray[0] = withoutParentheses;
 		}
-		//We want to remove the trailing ) to be able to split this string.
+		// We want to remove the trailing ) to be able to split this string.
 		for (String s : outputArray) {
 			String[] outSplit = s.split(",");
 			String name = outSplit[0].trim();
-			int amount = Integer.parseInt(outSplit[1].trim()); 
-			outs.add(new Output(name, amount, null)); //We need to update the entry from Null.
+			int amount = Integer.parseInt(outSplit[1].trim());
+			outs.add(new Output(name, amount, null)); // We need to update the entry from Null.
 		}
-		if(outs.size() != outputSize) {
+		if (outs.size() != outputSize) {
 			System.err.println("Invalid outputs!");
 			return;
 		}
 		Entry e = new Entry(this, ins, outs);
-		for(Output o : e.getOutputs()) {
+		for (Output o : e.getOutputs()) {
 			o.setEntry(e);
 		}
 		e.setTxID(split[0]);
@@ -192,6 +182,20 @@ public class Ledger {
 	public void addTransaction(Entry e) {
 		// Verify sanity.
 		e.setParentLedger(this);
+		for(Entry old : this.blockchain) {
+			if(old.getId().equals(e.getId())) {
+				System.err.println("Duplicate txid");
+				return;
+			}
+		}
+		//TODO FIX check for output doublespends
+		for(Output op : e.getOutputs()) {
+			if(isSpentInAnyTransaction(op)) {
+				System.err.println("Duplicate spend");
+				return;
+			}
+		}	
+		
 		if (e.sumOfIns() == 0) {
 			System.out.print("Transaction rejected, reason: ");
 			System.err.println("Empty input space");

@@ -39,4 +39,15 @@ public class Output {
 	public void setId(String id2) {
 		this.id = id2;
 	}
+
+	public int indexInChain(Ledger ledger) {
+		for(Entry e : ledger.getBlockchain()) {
+			for(int i=0; i<e.getOutputs().size(); i++) {
+				if(this.equals(e.getOutputs().get(i))) {
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
 }
