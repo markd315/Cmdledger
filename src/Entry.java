@@ -9,13 +9,11 @@ public class Entry {
 	private List<Output> outputs;
 
 	public Entry(Ledger parent, List<Input> ins, List<Output> outs) {
-		this.id = txIDgen();
 		this.inputs = ins;
 		this.outputs = outs;
 	}
 
 	public Entry(Ledger parent, List<Input> ins, Output... outs) {
-		this.id = txIDgen();
 		this.inputs = ins;
 		this.outputs = new ArrayList<Output>();
 
@@ -24,7 +22,6 @@ public class Entry {
 	}
 
 	public Entry(Ledger parent, Input ins, Output... outs) {
-		this.id = txIDgen();
 		this.inputs = new ArrayList<Input>();
 		this.inputs.add(ins);
 		this.outputs = new ArrayList<Output>();
@@ -61,17 +58,6 @@ public class Entry {
 
 	}
 
-	private String txIDgen() {
-		Random rng = new Random();
-		String str = "";
-		for (int i = 0; i < 8; i++) {
-			char toAdd = (char) rng.nextInt(122 - 97); // 65-122 inclusive
-			toAdd += 97;
-			str += toAdd;
-		}
-		return str;
-	}
-
 	public String toString() {
 		String ret = id + "; ";
 		ret += inputs.size() + "; ";
@@ -85,7 +71,7 @@ public class Entry {
 		return ret;
 	}
 
-	public int sumOfIns() {// TODO
+	public int sumOfIns() {
 		int ret = 0;
 		for(Input in : this.inputs) {
 			//For each, lookup the location of the output.

@@ -37,14 +37,6 @@ public class Ledger {
 	}
 
 	public double calcBalance(String username) throws Exception {
-		/* TODO
-		FAILING CASE
-		root; 0; ; 1; (Alice, 5000)
-		newt; 1; (root, 0); 2; (Sam, 2000)(Bob, 3000)
-		newtt; 1; (newt, 0); 2; (Bob, 1000)(Brock, 1000)
-		
-		SHOWS Sam having 2000, expected 0.
-		*/
 		Set<Output> unspent = new HashSet<Output>();
 		for (Entry e : blockchain) {
 			List<Output> outputs = e.getOutputs();
@@ -188,6 +180,11 @@ public class Ledger {
 	// transaction.
 	// Exception for vin!=vout && not genesis.
 	public void addTransaction(Entry e) {
+		//We need to set all of the outputs to have the right txid.
+		for(Output o : e.getOutputs()) {
+			o.setId(e.getId());
+		}
+		
 		// Verify sanity.
 		e.setParentLedger(this);
 		for(Entry old : this.blockchain) {
@@ -196,7 +193,6 @@ public class Ledger {
 				return;
 			}
 		}
-		//TODO FIX check for output doublespends
 		for(Input in : e.getInputs()) {
 			if(isSpentInAnyTransaction(lookupOutput(in))){
 				System.err.println("Duplicate spend");
