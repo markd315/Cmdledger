@@ -22,10 +22,7 @@ public class CmdLedger {
 	}
 
 	public static void main(String[] args){
-		Entry genesis = new Entry();
-		Output o = new Output("Alice", 5000, genesis);
-		Ledger session = new Ledger(genesis);
-		genesis.setSingleGenesis(session, o);
+		Ledger session = new Ledger();
 		Scanner in = new Scanner(System.in);
 		while (true) {
 			String cmd = in.nextLine();
@@ -37,11 +34,7 @@ public class CmdLedger {
 				System.out.println(session);
 			} // Print ledger
 			if (cmd.equalsIgnoreCase("w")) {
-				genesis = new Entry();
-				o = new Output("Alice", 5000, genesis);
-				session = new Ledger(genesis);
-				genesis.setSingleGenesis(session, o);
-				System.gc();
+				session.wipe();
 			}
 			if (cmd.equalsIgnoreCase("h")) {
 				System.out.println(
@@ -131,6 +124,7 @@ public class CmdLedger {
 	}
 
 	private static void loadFromFile(Ledger session, String remainingCmd) throws FileNotFoundException {
+		session.wipe();
 		Scanner fi = new Scanner(new File(remainingCmd));
 		while(fi.hasNextLine()) {
 			session.addTransaction(fi.nextLine());

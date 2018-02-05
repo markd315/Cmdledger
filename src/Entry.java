@@ -39,20 +39,6 @@ public class Entry {
 		this.parentLedger = l;
 	}
 
-	public void setSingleGenesis(Ledger l, Output output) {
-		if(l.getBlockchain().get(0) != this) {
-			System.err.println("This is not the root transaction!");
-			return;
-		}
-		this.id = "root";
-		this.inputs = new ArrayList<Input>();
-		this.outputs = new ArrayList<Output>(); // Empty lists for the inputs.
-		this.addOutput(output);
-		for(Output o : this.outputs) {
-			o.setId(this.id);
-		}
-	}
-
 	private void addOutput(Output op) {
 		this.outputs.add(op);
 
