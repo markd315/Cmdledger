@@ -41,13 +41,13 @@ public class Ledger {
 		for (Entry e : blockchain) {
 			List<Output> outputs = e.getOutputs();
 			for (int i = 0; i < outputs.size(); i++) {
-				if (outputs.get(i).equals(username)) { // We found one output of this transaction.
+				if (outputs.get(i).getName().equals(username)) { // We found one output of this transaction.
 					Output temp = outputs.get(i);
 					unspent.add(temp);
 				}
 			}
 		} // Locate all vout relations (amount, transID, inputIndex) WHERE name=name
-
+		//TODO additive balance is working, subtractive is NOT.
 		// SAVE THE INDEX. SAVE THE TXID FROM THIS NAME SEARCH.
 		// CHECK THE TXID for ALL TRANSACTIONS.
 		// DOES THE UNSPENT SET CONTAIN THIS TXID?
@@ -140,7 +140,6 @@ public class Ledger {
 			inputArray = new String[1];
 			inputArray[0] = withoutParentheses;
 		}
-		//TODO passes 1 case, fails >1 case.
 		//TESTCMD: t newt; 2; (root, 0)(root, 1); 2; (Sam, 2000)(Bob, 3000)
 		//We want to remove the leading ( to be able to split this string.
 		for (String s : inputArray) {
@@ -180,6 +179,7 @@ public class Ledger {
 		for(Output o : e.getOutputs()) {
 			o.setEntry(e);
 		}
+		e.setTxID(split[0]);
 		this.addTransaction(e);
 		return;
 	}
@@ -189,6 +189,7 @@ public class Ledger {
 	// Exception for vin!=vout && not genesis.
 	public void addTransaction(Entry e) {
 		// Verify sanity.
+		e.setParentLedger(this);
 		if (e.sumOfIns() == 0) {
 			System.out.print("Transaction rejected, reason: ");
 			System.err.println("Empty input space");

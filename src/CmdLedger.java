@@ -85,7 +85,7 @@ public class CmdLedger {
 				break;
 			case 'b':
 				try {
-					System.out.println(session.calcBalance(remainingCmd));
+					System.out.println(session.calcBalance(remainingCmd.trim()));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

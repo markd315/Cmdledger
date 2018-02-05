@@ -35,4 +35,8 @@ public class Output {
 	public void setEntry(Entry e) {
 		this.id = e.getId();
 	}
+
+	public void setId(String id2) {
+		this.id = id2;
+	}
 }

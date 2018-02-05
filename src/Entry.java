@@ -51,7 +51,9 @@ public class Entry {
 		this.inputs = new ArrayList<Input>();
 		this.outputs = new ArrayList<Output>(); // Empty lists for the inputs.
 		this.addOutput(output);
-		
+		for(Output o : this.outputs) {
+			o.setId(this.id);
+		}
 	}
 
 	private void addOutput(Output op) {
@@ -62,9 +64,9 @@ public class Entry {
 	private String txIDgen() {
 		Random rng = new Random();
 		String str = "";
-		for (int i = 0; i < 16; i++) {
-			char toAdd = (char) rng.nextInt(122 - 65); // 65-122 inclusive
-			toAdd += 65;
+		for (int i = 0; i < 8; i++) {
+			char toAdd = (char) rng.nextInt(122 - 97); // 65-122 inclusive
+			toAdd += 97;
 			str += toAdd;
 		}
 		return str;
@@ -88,7 +90,16 @@ public class Entry {
 		for(Input in : this.inputs) {
 			//For each, lookup the location of the output.
 			//Safely break if DNE.
-			
+			for(Entry e : parentLedger.getBlockchain()) {
+				if (e.id.equals(in.getId())) {
+					try {
+					ret +=e.getOutputs().get(in.getIndex()).getAmount();
+					}catch(Exception ex) {
+						System.err.println("Couldn't find referenced previous output to use as an input.");
+						return -1;
+					}
+				}
+			}
 		}
 		return ret;
 	}
@@ -111,5 +122,9 @@ public class Entry {
 			sum += k.getAmount();
 		}
 		return sum;
+	}
+
+	public void setTxID(String string) {
+		this.id = string;
 	}
 }
