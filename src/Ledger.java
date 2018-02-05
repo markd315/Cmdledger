@@ -36,7 +36,7 @@ public class Ledger {
 		blockchain.add(e);
 	}
 
-	public double calcBalance(String username) throws Exception{
+	public double calcBalance(String username) throws Exception {
 		Set<Output> unspent = new HashSet<Output>();
 		for (Entry e : blockchain) {
 			List<Output> outputs = e.getOutputs();
@@ -80,7 +80,7 @@ public class Ledger {
 		return sum;
 	}
 
-	private int lookupOutput(Output op) throws Exception{
+	private int lookupOutput(Output op) throws Exception {
 		for (Entry e : this.blockchain) {
 			for (int i = 0; i < e.getOutputs().size(); i++) {
 				if (op.equals(e.getOutputs().get(i))) {
@@ -117,12 +117,48 @@ public class Ledger {
 		this.isInteractive = isInteractive;
 	}
 
-	// This needs to handle geneses and check them to see if they are the first
-	// transaction.
-	// Exception for vin!=vout && not genesis.
-	public void addTransaction(String remainingCmd){
-		// TODO Construct an E to add.
-		
+	// 4787df35; 1;(f2cea539, 0);3; (Bob, 150)(Alice, 845)(Gopesh, 5)
+	public void addTransaction(String remainingCmd) {
+		// Break the String into 5 parts by split;
+		String[] split = remainingCmd.split(";");
+		if (split.length != 5) {
+			System.err.println("Unable to parse into the 5 arguments");
+			return;
+		}
+		for (int i = 0; i < split.length; i++) {
+			split[i] = split[i].trim();
+		}
+		int inputSize = Integer.parseInt(split[1]);
+		List<Input> ins=  new ArrayList<Input>();
+		String[] inputArray = split[2].split(")");
+		for (String s : inputArray) {
+			s.replace("(", "");
+			String[] inSplit = s.split(",");
+			String txid = inSplit[0].trim();
+			int index = Integer.parseInt(inSplit[1].trim()); 
+			ins.add(new Input(txid, index));
+		}
+		if(ins.size() != inputSize) {
+			System.err.println("Invalid inputs!");
+		}
+
+		int outputSize = Integer.parseInt(split[3]);
+		List<Output> outs=  new ArrayList<Output>();
+		String[] outputArray = split[4].split(")");
+		for (String s : outputArray) {
+			s.replace("(", "");
+			String[] outSplit = s.split(",");
+			String name = outSplit[0].trim();
+			int amount = Integer.parseInt(outSplit[1].trim()); 
+			outs.add(new Output(name, amount, null)); //We need to update the entry from Null.
+		}
+		if(outs.size() != outputSize) {
+			System.err.println("Invalid outputs!");
+		}
+		Entry e = new Entry(this, ins, outs);
+		for(Output o : e.getOutputs()) {
+			o.setEntry(e);
+		}
 		this.addTransaction(e);
 		return;
 	}

@@ -29,4 +29,8 @@ public class Output {
 	public void setAmount(int amount) {
 		this.amount = amount;
 	}
+
+	public void setEntry(Entry e) {
+		this.id = e.getId();
+	}
 }
