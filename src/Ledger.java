@@ -4,36 +4,43 @@ import java.util.List;
 import java.util.Set;
 
 public class Ledger {
-/*
- * Format of Transactions:
-<TransID>; M; (<TransID>, <vout>)^M; N; (<AcctID>, <amount>)^N 
-Items in angle brackets are parameters, M and N are whole numbers, and caret M (or N) indicates M (or N) repetitions of the parenthesized pairs. 
-
-Example Transaction:
-4787df35; 1;(f2cea539, 0);3; (Bob, 150)(Alice, 845)(Gopesh, 5)
- */
-	private boolean isInteractive, isVerbose;
-	public List<Entry> getBlockchain() {
-		return blockchain;
-	}
-	private List<Entry> blockchain;
+	/*
+	 * Format of Transactions: <TransID>; M; (<TransID>, <vout>)^M; N; (<AcctID>,
+	 * <amount>)^N Items in angle brackets are parameters, M and N are whole
+	 * numbers, and caret M (or N) indicates M (or N) repetitions of the
+	 * parenthesized pairs.
+	 * 
+	 * Example Transaction: 4787df35; 1;(f2cea539, 0);3; (Bob, 150)(Alice,
+	 * 845)(Gopesh, 5)
+	 */
 	public Ledger(Entry genesis) {
 		blockchain = new ArrayList<Entry>();
 		blockchain.add(genesis);
+		genesis.setParentLedger(this);
 	}
+
+	private boolean isInteractive, isVerbose;
+
+	public List<Entry> getBlockchain() {
+		return blockchain;
+	}
+
+	private List<Entry> blockchain;
+
 	public void addTx(Entry e) {
-		if(e.sumOfIns() != e.sumOfOuts()) {
+		if (e.sumOfIns() != e.sumOfOuts()) {
 			System.out.println("Invalid transaction sum");
 			return;
 		}
+		e.setParentLedger(this);
 		blockchain.add(e);
 	}
+
 	public double calcBalance(String username){
-		
+		Set<Vout> unspent = new HashSet<Vout>();
 		for(Entry e : blockchain) {
 			int sum = 0;
 			List<String> outputs = e.getOutputNames();
-			Set<Vout> unspent = new HashSet<Vout>();
 			for(int i=0; i< outputs.size(); i++) {
 			if(outputs.get(i).equals(username)) { //We found one output of this transaction.
 				Vout temp = new Vout(e.getId(), e.getOutputAmounts().get(i), i);
@@ -45,9 +52,14 @@ Example Transaction:
 		
 		
 		//Subtract them from the set when they are used.
-		for(Entry e : blockchain.getIds) {
-			//TODO fix this.
-			if(unspent.contains(e.getInputIDs())) {
+		for(Entry e : blockchain) {
+			for(Vout output : unspent) {
+				if(e.getInputIDs().equals(output.getId()) && e.getInputIndices().get(output.getIndex())) {//Match the 
+					
+				}
+			}
+			
+			/*if(unspentcontains()) {
 				//spends from this transaction
 				for() {//every possible index
 					if() {//match{
@@ -55,7 +67,8 @@ Example Transaction:
 					}
 						
 				}
-			}
+			}*/
+			
 				
 		}
 		
@@ -69,27 +82,31 @@ Example Transaction:
 		
 		
 	}
-	
+
 	public String toString() {
 		String ret = "";
-		for(Entry e : blockchain) {
-			ret+=e;
-			ret+="\n";
+		for (Entry e : blockchain) {
+			ret += e;
+			ret += "\n";
 		}
 		return ret.trim();
-		
+
 	}
+
 	public boolean isVerbose() {
 		return isVerbose;
 	}
+
 	public void setVerbose(boolean isVerbose) {
 		this.isVerbose = isVerbose;
 	}
+
 	public boolean isInteractive() {
 		return isInteractive;
 	}
+
 	public void setInteractive(boolean isInteractive) {
 		this.isInteractive = isInteractive;
 	}
-	
+
 }

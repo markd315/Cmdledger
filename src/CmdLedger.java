@@ -21,7 +21,10 @@ public class CmdLedger {
 		return importer;
 	}
 	public static void main(String[] args) {
-		Ledger session = new Ledger();
+		Entry genesis = new Entry();
+		Output op = new Output("Alice", 5000);
+		genesis.setSingleGenesis(op);
+		Ledger session = new Ledger(genesis);
 		Scanner in = new Scanner(System.in);
 		while(true) {
 			String cmd = in.nextLine();
@@ -33,7 +36,9 @@ public class CmdLedger {
 				System.out.println(session);
 			}//Print ledger
 			if(cmd.equalsIgnoreCase("w")) {
-				session = new Ledger();
+				genesis = new Entry();
+				genesis.setSingleGenesis(5000, "Alice");
+				session = new Ledger(genesis);
 				System.gc();
 			}
 			if(cmd.equalsIgnoreCase("h")) {
