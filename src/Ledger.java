@@ -121,4 +121,11 @@ public class Ledger {
 		this.isInteractive = isInteractive;
 	}
 
+	//This needs to handle geneses and check them to see if they are the first transaction.
+	//Exception for vin!=vout && not genesis.
+	public void addTransaction(String remainingCmd) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
