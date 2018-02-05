@@ -23,9 +23,9 @@ public class CmdLedger {
 
 	public static void main(String[] args){
 		Entry genesis = new Entry();
-		Output op = new Output("Alice", 5000, genesis);
-		genesis.setSingleGenesis(op);
+		Output o = new Output("Alice", 5000, genesis);
 		Ledger session = new Ledger(genesis);
+		genesis.setSingleGenesis(session, o);
 		Scanner in = new Scanner(System.in);
 		while (true) {
 			String cmd = in.nextLine();
@@ -38,9 +38,9 @@ public class CmdLedger {
 			} // Print ledger
 			if (cmd.equalsIgnoreCase("w")) {
 				genesis = new Entry();
-				Output o = new Output("Alice", 5000, genesis);
-				genesis.setSingleGenesis(o);
+				o = new Output("Alice", 5000, genesis);
 				session = new Ledger(genesis);
+				genesis.setSingleGenesis(session, o);
 				System.gc();
 			}
 			if (cmd.equalsIgnoreCase("h")) {
@@ -126,7 +126,7 @@ public class CmdLedger {
 
 
 	private static void dumpFile(Ledger session, String remainingCmd) {
-		// TODO Auto-generated method stub
+		// TODO Implement file dumping.
 		
 	}
 

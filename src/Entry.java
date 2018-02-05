@@ -42,10 +42,16 @@ public class Entry {
 		this.parentLedger = l;
 	}
 
-	public void setSingleGenesis(Output output) {
+	public void setSingleGenesis(Ledger l, Output output) {
+		if(l.getBlockchain().get(0) != this) {
+			System.err.println("This is not the root transaction!");
+			return;
+		}
+		this.id = "root";
 		this.inputs = new ArrayList<Input>();
 		this.outputs = new ArrayList<Output>(); // Empty lists for the inputs.
 		this.addOutput(output);
+		
 	}
 
 	private void addOutput(Output op) {
@@ -66,10 +72,11 @@ public class Entry {
 
 	public String toString() {
 		String ret = id + "; ";
+		ret += inputs.size() + "; ";
 		for (int i = 0; i < inputs.size(); i++) {
 			ret += "(" + inputs.get(i).getId() + ", " + inputs.get(i).getIndex() + ")";
 		}
-		ret += "; " + outputs.size();
+		ret += "; " + outputs.size() + "; ";
 		for (int i = 0; i < outputs.size(); i++) {
 			ret += "(" + outputs.get(i).getName() + ", " + outputs.get(i).getAmount() + ")";
 		}
@@ -87,10 +94,6 @@ public class Entry {
 					// input here.
 					// We need to use the input index to know WHICH one is the input.
 					ret += parentLedger.getBlockchain().get(i).getOutputs().get(inputIndexIndex).getAmount();// We need
-																												// to
-																												// find
-																												// the
-					// TODO
 				}
 			}
 		}

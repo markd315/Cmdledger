@@ -60,7 +60,6 @@ public class Ledger {
 				if (op.getId().equals(e.getId())) {// Yes?
 					for (Input in : e.getInputs()) {
 						int index = in.getIndex();
-						// TODO how do I find the output index location?
 						int outputIndexLocation = lookupOutput(op);
 						if (index == outputIndexLocation) {
 							unspent.remove(op);
@@ -130,7 +129,8 @@ public class Ledger {
 		}
 		int inputSize = Integer.parseInt(split[1]);
 		List<Input> ins=  new ArrayList<Input>();
-		String[] inputArray = split[2].split(")");
+		String[] inputArray = split[2].substring(0, split[2].length() - 1).split(")");
+		//We want to remove the trailing ) to be able to split this string.
 		for (String s : inputArray) {
 			s.replace("(", "");
 			String[] inSplit = s.split(",");
@@ -144,7 +144,8 @@ public class Ledger {
 
 		int outputSize = Integer.parseInt(split[3]);
 		List<Output> outs=  new ArrayList<Output>();
-		String[] outputArray = split[4].split(")");
+		String[] outputArray = split[4].substring(0, split[4].length() - 1).split(")");
+		//We want to remove the trailing ) to be able to split this string.
 		for (String s : outputArray) {
 			s.replace("(", "");
 			String[] outSplit = s.split(",");
