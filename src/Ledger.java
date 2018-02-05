@@ -129,10 +129,21 @@ public class Ledger {
 		}
 		int inputSize = Integer.parseInt(split[1]);
 		List<Input> ins=  new ArrayList<Input>();
-		String[] inputArray = split[2].substring(0, split[2].length() - 1).split(")");
-		//We want to remove the trailing ) to be able to split this string.
+		String temp = split[2].substring(1, split[2].length() - 1);
+		String withoutParentheses = temp.replaceAll("\\)",";");
+		withoutParentheses = withoutParentheses.replaceAll("\\(","");
+		String[] inputArray = {};
+		
+		if(withoutParentheses.contains(";")){
+			inputArray = withoutParentheses.split(";");
+		}else {
+			inputArray = new String[1];
+			inputArray[0] = withoutParentheses;
+		}
+		//TODO passes 1 case, fails >1 case.
+		//TESTCMD: t newt; 2; (root, 0)(root, 1); 2; (Sam, 2000)(Bob, 3000)
+		//We want to remove the leading ( to be able to split this string.
 		for (String s : inputArray) {
-			s.replace("(", "");
 			String[] inSplit = s.split(",");
 			String txid = inSplit[0].trim();
 			int index = Integer.parseInt(inSplit[1].trim()); 
@@ -144,10 +155,19 @@ public class Ledger {
 
 		int outputSize = Integer.parseInt(split[3]);
 		List<Output> outs=  new ArrayList<Output>();
-		String[] outputArray = split[4].substring(0, split[4].length() - 1).split(")");
+		String[] outputArray = {};
+		temp = split[4].substring(1, split[4].length() - 1);
+		withoutParentheses = temp.replaceAll("\\)",";");
+		withoutParentheses = withoutParentheses.replaceAll("\\(","");
+		
+		if(withoutParentheses.contains(";")){
+			outputArray = withoutParentheses.split(";");
+		}else {
+			outputArray = new String[1];
+			outputArray[0] = withoutParentheses;
+		}
 		//We want to remove the trailing ) to be able to split this string.
 		for (String s : outputArray) {
-			s.replace("(", "");
 			String[] outSplit = s.split(",");
 			String name = outSplit[0].trim();
 			int amount = Integer.parseInt(outSplit[1].trim()); 

@@ -83,19 +83,12 @@ public class Entry {
 		return ret;
 	}
 
-	public int sumOfIns() {// TODO I WROTE THIS DRUNK AND IT NEEDS A UNIT TEST
+	public int sumOfIns() {// TODO
 		int ret = 0;
-		for (int inputIndexIndex = 0; inputIndexIndex < inputs.size(); inputIndexIndex++) {
-			for (int i = 0; i < parentLedger.getBlockchain().size(); i++) {// This runs in constant time with the number
-																			// of inputs.
-				if (this.getInputs().contains(parentLedger.getBlockchain().get(i))) {//
-					// We found an input to THIS transaction entry.
-					// So now what we do is sum up the INDEX OUTPUT of those valid transactions that
-					// input here.
-					// We need to use the input index to know WHICH one is the input.
-					ret += parentLedger.getBlockchain().get(i).getOutputs().get(inputIndexIndex).getAmount();// We need
-				}
-			}
+		for(Input in : this.inputs) {
+			//For each, lookup the location of the output.
+			//Safely break if DNE.
+			
 		}
 		return ret;
 	}

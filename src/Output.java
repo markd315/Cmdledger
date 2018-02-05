@@ -7,7 +7,9 @@ public class Output {
 	public Output(String name, int amount, Entry entry) {
 		this.name = name;
 		this.amount = amount;
-		this.id = entry.getId();
+		if(entry != null) {
+			this.id = entry.getId();
+		}
 	}
 
 	public String getId() {
