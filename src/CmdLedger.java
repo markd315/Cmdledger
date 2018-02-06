@@ -6,23 +6,6 @@ import java.util.Scanner;
 
 public class CmdLedger {
 
-	public static String readFile(String nameAndExtension) {
-		String importer = "";
-		Scanner fi = null;
-		try {
-			fi = new Scanner(new File(nameAndExtension));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		while (fi.hasNextLine()) {
-			importer += fi.nextLine();
-			importer += "\n";
-		}
-		importer.substring(0, importer.length() - 1); // strip trailing whitespace.
-		importer.trim();
-		return importer;
-	}
-
 	public static void main(String[] args){
 		Ledger session = new Ledger();
 		Scanner in = new Scanner(System.in);
