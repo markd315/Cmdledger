@@ -1,0 +1,111 @@
+This repository can be cloned or downloaded.
+
+There is a makefile within the src or bin directory that will create a jarfile also within that directory.
+
+The jarfile can be run with 'java -jar CmdLedger.jar'
+
+There are 6 unit tests that can be found in the tests directory. All pass and together they provide >77% coverage: https://i.gyazo.com/44345b8b0745aa3e7d750e955fcbb119.png
+
+
+Descriptive errors are provided but they may not match the exact strings you gave. Hope that counts.
+
+
+#relevant issues this project addresses.
+How a Bitcoin Transaction works:
+
+What’s a Transaction in Bitcoin?
+
+The act of “spending” happens when a user digitally signs a transaction that transfers value from a previous transaction (an unspent transaction output, or UTXO) to a new owner.  When a wallet has received bitcoin, the wallet has detected that a UTXO can be spent using the one of the keys controlled by that wallet.  A user’s bitcoin balance is the sum of all these UTXOs scattered on the blockchain.  The wallet calculates the balance by scanning and aggregating the total value.  Transaction outputs are indivisible chunks of bitcoin currency.  An unspent output can only be consumed in its entirety by a transaction, so if you need change, then a transaction must produce a separate UTXO for change, so that all the UTXOs sum to the amount of the original value of the input.  Most bitcoin transactions generate change. Once a UTXO has been used as input to another transaction, it has been spent and is no longer a UTXO. 
+
+Parts of a Bitcoin Transaction: Inputs, Outputs
+
+Inputs – What you are spending – (Debit)
+Transaction inputs reference previous transaction outputs and identify which UTXO is consumed and provide proof of ownership.  To build a transaction, the wallet selects from the UTXOs it controls with enough value.  
+
+Outputs – the Result of your transaction – (Credit)
+UTXOs “Unspent Transaction Outputs” are the fundamental building block of a transaction output. Transaction outputs are pairs that name the account (key) and the amount from the transaction inputs that are to be credited to the named account. 
+
+A transaction that does not provide proof of authorization to spend a UTXO listed as input, or that lists an invalid UTXO is not accepted. All accepted transactions are stored on the blockchain.  
+
+The menu contains:
+
+[F]ile:  Supply filename:<infilename>.  Read in a file of transactions. Any invalid transaction shall be identified with an error message to stderr, but not stored. Print an error message to stderr if the input file named cannot be opened. The message shall be “Error: file <infilename> cannot be opened for reading” on a single line, where <infilename> is the name provided as additional command input.  
+
+[T]ransaction: Supply Transaction:<see format below>   Read in a single transaction in the format shown below.  It shall be checked for validity against the ledger, and added if it is valid. If it is not valid, then do not add it to the ledger and print a message to stderr with the transaction number followed by a colon, a space, and the reason it is invalid on a single line.
+
+[E]xit:  Quit the program
+
+[P]rint:  Print current ledger (all transactions in the order they were added) to stdout in the transaction format given below, one transaction per line.
+
+[H]elp:  Command Summary
+
+[D]ump:  Supply filename:<outfilename>.  Dump ledger to the named file. Print an error message to stderr if the output file named cannot be opened. The message shall be “Error: file <outfilename> cannot be opened for writing” on a single line, where <outfilename> is the name provided as additional command input. 
+
+[W]ipe:  Wipe the entire ledger to start fresh.
+
+[I]nteractive: Toggle interactive mode. Start in non-interactive mode, where no command prompts are printed. Print command prompts and prompts for additional input in interactive mode, starting immediately (i.e., print a command prompt following the I command).
+
+[V]erbose: Toggle verbose mode. Start in non-verbose mode. In verbose mode, print additional diagnostic information as you wish. At all times, output each transaction number as it is read in, followed by a colon, a space, and the result (“good” or “bad”). 
+
+[B]alance:  Supply username:  (e.g. Alice).  This command prints the current balance of a user.    
+
+Format of Transactions:
+<TransID>; M; (<TransID>, <vout>)^M; N; (<AcctID>, <amount>)^N 
+Items in angle brackets are parameters, M and N are whole numbers, and caret M (or N) indicates M (or N) repetitions of the parenthesized pairs. 
+
+Example Transaction:
+4787df35; 1;(f2cea539, 0);3; (Bob, 150)(Alice, 845)(Gopesh, 5)
+
+<TransID> refers to a 32-bit transaction identifier given in hexadecimal format. For now, it will just be given as input (later it will be calculated). 
+
+M is the number of UTXOs that are inputs to this transaction. The genesis transaction is the only transaction allowed to have zero input UTXOs, and must be the first transaction in any ledger. 
+
+<vout> refers to the value out (vout) index of the UTXO, where the first index is zero.  For example, vout 0 in transaction f2cea539 refers to (Alice, 1000). 
+
+Following the field with the number M of input UTXOs is the field that lists those UTXOs as a sequence of M pairs, each pair in parentheses, elements separated by a comma, consisting of a transaction ID and a vout from that transaction.
+
+N is the number of transaction outputs. N is always positive. 
+
+<AcctID> refers to the alphanumeric account identifier (for now, we will just provide these). 
+
+<amount> is a natural number of satoshis that is credited to the account named in the pair by this transaction. 
+
+Following the field with the number N of value outputs is the field that lists those outputs as a sequence of N pairs, each pair in parentheses, elements separated by a comma, consisting of an account ID and an amount credited to that account by this transaction. The last such pair is the fee given to the account responsible for adding this transaction to the ledger. In this exercise, we will fill in the account identifier; later, this will be given as a keyword FEE in a proposed transaction, with the account owner responsible providing their account ID. 
+
+Example ledger:
+
+f2cea539;	0;		1;	(Alice, 1000) 
+4787df35;	1;	(f2cea539, 0);	3;	(Bob, 150)(Alice, 845)(Gopesh, 5)
+40671f57;	1;	(4787df35, 0);	3;	(Gopesh, 100)(Bob, 45)(Bob, 5)
+84dfb9b3	1;	(40671f57, 0);	2;	(Bob, 100)(Gopesh, 5)
+
+
+File format version of example ledger:
+f2cea539; 0; ; 1; (Alice, 1000)
+4787df35; 1; (f2cea539, 0); 3; (Bob, 150)(Alice, 845)(Gopesh, 5)
+40671f57; 1; (4787df35, 0); 3; (Gopesh, 100)(Bob, 45)(Bob, 5)
+84dfb9b3; 1; (40671f57, 0); 2; (Bob, 100)(Gopesh, 5)
+
+The format for input transactions and for the dumped ledger are identical, as you can see.
+
+Example Run: (interactive)
+$ ./ledger
+[F]ile
+[T]ransaction
+[P]rint
+[H]elp
+[D]ump
+[W]ipe
+[I]nteractive
+[V]erbose
+[B]alance
+[E]xit
+Select a command: T
+Enter Transaction: 84dfb9b3; 1; (40671f57, 0); 2; (Bob, 100)(Gopesh, 5)
+Sorry, invalid transaction. Not enough money…
+Select a command: B
+Enter User: Alice
+Alice has 850
+Select a command: E
+Good-bye
+$ 
