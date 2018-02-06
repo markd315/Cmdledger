@@ -72,7 +72,7 @@ public class CmdLedger {
 				try {
 					loadFromFile(session, remainingCmd);
 				} catch (FileNotFoundException e) {
-					System.err.println("File Not Found.");
+					System.err.println("Error: file " + remainingCmd.trim() +" cannot be opened for reading");
 				}
 				break;
 			case 't':
@@ -97,30 +97,6 @@ public class CmdLedger {
 			// execute library command.
 
 		}
-		/*
-		 * [F]ile: Supply filename:<infilename>. Read in a file of transactions. Any
-		 * invalid transaction shall be identified with an error message to stderr, but
-		 * not stored. Print an error message to stderr if the input file named cannot
-		 * be opened. The message shall be “Error: file <infilename> cannot be opened
-		 * for reading” on a single line, where <infilename> is the name provided as
-		 * additional command input.
-		 * 
-		 * [T]ransaction: Supply Transaction:<see format below> Read in a single
-		 * transaction in the format shown below. It shall be checked for validity
-		 * against the ledger, and added if it is valid. If it is not valid, then do not
-		 * add it to the ledger and print a message to stderr with the transaction
-		 * number followed by a colon, a space, and the reason it is invalid on a single
-		 * line.
-		 * 
-		 * [D]ump: Supply filename:<outfilename>. Dump ledger to the named file. Print
-		 * an error message to stderr if the output file named cannot be opened. The
-		 * message shall be “Error: file <outfilename> cannot be opened for writing” on
-		 * a single line, where <outfilename> is the name provided as additional command
-		 * input.
-		 * 
-		 * [B]alance: Supply username: (e.g. Alice). This command prints the current
-		 * balance of a user.
-		 */
 	}
 
 

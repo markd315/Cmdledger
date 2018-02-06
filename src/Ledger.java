@@ -40,7 +40,7 @@ public class Ledger {
 		blockchain.add(e);
 	}
 
-	public double calcBalance(String username) throws Exception {
+	public int calcBalance(String username) throws Exception {
 		Set<Output> unspent = new HashSet<Output>();
 		for (Entry e : blockchain) {
 			List<Output> outputs = e.getOutputs();
