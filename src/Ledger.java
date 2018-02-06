@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -57,11 +58,11 @@ public class Ledger {
 			// Yes? CHECK ALL INPUTS FOR THIS TRANSACTION.
 			// Does the output index location from the output list match the input.index?
 			// MATCHES? REMOVE IT FROM THE UNSPENT SET.
-		for (Output op : unspent) { // Does the unspent set contain this txid?
-			// e.getInputs is empty. We need to grab the OUTPUTS of e and INPUTS of the op
-			if (isSpentInAnyTransaction(op)) {
-				unspent.remove(op);
-			}
+		for (Iterator<Output> i = unspent.iterator(); i.hasNext();) {
+		    Output element = i.next();
+		    if (isSpentInAnyTransaction(element)) {
+		        i.remove();
+		    }
 		}
 		// Iterate across the remaining set and sum the balance.
 		int sum = 0;
