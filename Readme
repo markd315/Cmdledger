@@ -7,7 +7,9 @@ The jarfile can be run with 'java -jar CmdLedger.jar'
 There are 6 unit tests that can be found in the tests directory. All pass and together they provide >77% coverage: https://i.gyazo.com/44345b8b0745aa3e7d750e955fcbb119.png
 
 
-Descriptive errors are provided but they may not match the exact strings you gave. Hope that counts.
+Descriptive errors are provided but they may not match the exact strings shown below.
+
+For more help or to split commands across lines, recieving prompts: try toggling [v]erbose and [i]nteractive on.
 
 
 #relevant issues this project addresses.
