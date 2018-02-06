@@ -13,23 +13,6 @@ public class Entry {
 		this.outputs = outs;
 	}
 
-	public Entry(Ledger parent, List<Input> ins, Output... outs) {
-		this.inputs = ins;
-		this.outputs = new ArrayList<Output>();
-
-		for (Output o : outs)
-			this.outputs.add(o);
-	}
-
-	public Entry(Ledger parent, Input ins, Output... outs) {
-		this.inputs = new ArrayList<Input>();
-		this.inputs.add(ins);
-		this.outputs = new ArrayList<Output>();
-
-		for (Output o : outs)
-			this.outputs.add(o);
-	}
-
 	public Entry() {
 		//We must call a genesis set on this constructor or add valid inputs or outputs for it to be accepted.
 		
@@ -37,11 +20,6 @@ public class Entry {
 
 	public void setParentLedger(Ledger l) {
 		this.parentLedger = l;
-	}
-
-	private void addOutput(Output op) {
-		this.outputs.add(op);
-
 	}
 
 	public String toString() {
