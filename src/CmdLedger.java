@@ -100,7 +100,7 @@ public class CmdLedger {
 	}
 
 
-	private static void dumpFile(Ledger session, String remainingCmd) throws IOException {
+	public static void dumpFile(Ledger session, String remainingCmd) throws IOException {
 		FileOutputStream fs = new FileOutputStream(new File(remainingCmd.trim()));
 		for(Entry e : session.getBlockchain()) {
 			fs.write(e.toString().getBytes());
@@ -110,7 +110,7 @@ public class CmdLedger {
 		fs.close();
 	}
 
-	private static void loadFromFile(Ledger session, String remainingCmd) throws FileNotFoundException {
+	public static void loadFromFile(Ledger session, String remainingCmd) throws FileNotFoundException {
 		session.wipe();
 		Scanner fi = new Scanner(new File(remainingCmd));
 		while(fi.hasNextLine()) {

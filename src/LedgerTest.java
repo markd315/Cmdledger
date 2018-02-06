@@ -1,22 +1,8 @@
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.both;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.everyItem;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,8 +11,29 @@ public class LedgerTest {
 
 	Ledger l;
 	@Before
-	public void callBefore() {
+	public void callBefore(){
 		l = new Ledger();
+	}
+	
+	@Test
+	public void canLoadAndDumpTxFromFile() throws Exception {
+		CmdLedger.loadFromFile(l, "testinputs.txt");
+		assertTrue(l.getBlockchain().size() == 3);
+		assertTrue(l.calcBalance("Bob") == 3000);
+		assertTrue(l.calcBalance("Milo") == 1500);
+		assertTrue(l.calcBalance("Band") == 1500);
+		assertTrue(l.calcBalance("Alice") == 0);
+		assertTrue(l.calcBalance("Sam") == 0);
+		l.addTransaction("dump; 1; (newtt, 0); 2; (Alice, 1000)(Milo, 500)");
+		CmdLedger.dumpFile(l, "testoutputs.txt");
+		l = new Ledger();
+		CmdLedger.loadFromFile(l, "testoutputs.txt");
+		assertTrue(l.getBlockchain().size() == 4);
+		assertTrue(l.calcBalance("Bob") == 3000);
+		assertTrue(l.calcBalance("Milo") == 500);
+		assertTrue(l.calcBalance("Band") == 1500);
+		assertTrue(l.calcBalance("Alice") == 1000);
+		assertTrue(l.calcBalance("Sam") == 0);
 	}
 	
 	@Test
