@@ -22,6 +22,8 @@ public class Ledger {
 
 	public Ledger() {
 		blockchain = new ArrayList<Entry>();
+		isInteractive = false;
+		isVerbose = false;
 	}
 
 	private boolean isInteractive, isVerbose;

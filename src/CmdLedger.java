@@ -6,12 +6,69 @@ import java.util.Scanner;
 
 public class CmdLedger {
 
-	public static void main(String[] args){
+	public static void main(String[] args) {
 		Ledger session = new Ledger();
 		Scanner in = new Scanner(System.in);
 		while (true) {
+			if (session.isInteractive()) {
+				System.out.println(
+						"Give a command! [H]elp, [E]xit, [P]rint, [W]ipe, [B]alance, [T]x [V]erbose, [I]nteractive, [F]ile, [D]ump");
+			}
 			String cmd = in.nextLine();
+			if (session.isInteractive()) {
+				switch (cmd) {
+				case "f":
+					if (session.isVerbose()) {
+						System.out.println("File load initiated!");
+					}
+					System.out.println("Which filename (full extension)");
+					cmd += " " + in.nextLine();
+					break;
+				case "t":
+					if (session.isVerbose()) {
+						System.out.println("Transaction add initiated!");
+						if(session.getBlockchain().size() == 0) {
+							System.out.println("Your blockchain is empty and needs a genesis transaction.");
+							System.out.println("Please add a transaction with no inputs, like \"root; 0; ; 1; (God, 1000)\"");
+							System.out.println("Please note that unbalanced transactions of this type are not usually allowed.");
+						}
+					}
+					System.out.println("Which transaction name?");
+					cmd += " " + in.nextLine() + "; ";
+					System.out.println("How many transaction inputs?");
+					cmd += " " + in.nextLine() + "; ";
+					System.out.println("Give inputs in format (txid, index)(txid, index)");
+					cmd += " " + in.nextLine() + "; ";
+					System.out.println("How many transaction outputs?");
+					cmd += " " + in.nextLine() + "; ";
+					System.out.println("Give outputs in format (name, amount)(name, amount)");
+					cmd += " " + in.nextLine();
+					break;
+				case "b":
+					if (session.isVerbose()) {
+						System.out.println("Balance check initiated!");
+					}
+					System.out.println("Which user balance to check?");
+					cmd += " " + in.nextLine();
+					break;
+				case "d":
+					if (session.isVerbose()) {
+						System.out.println("File store initiated!");
+					}
+					System.out.println("Which filename (full extension)");
+					cmd += " " + in.nextLine();
+					break;
+				default:
+					if (session.isVerbose()) {
+						System.out.println("Executing command " + cmd);
+					}
+
+				}
+			}
 			if (cmd.equalsIgnoreCase("e")) {
+				if(session.isVerbose()) {
+					System.out.println("Exiting!");
+				}
 				break;
 			}
 			// check for exit.
@@ -19,6 +76,9 @@ public class CmdLedger {
 				System.out.println(session);
 			} // Print ledger
 			if (cmd.equalsIgnoreCase("w")) {
+				if(session.isVerbose()) {
+					System.out.println("Session wiping!");
+				}
 				session.wipe();
 			}
 			if (cmd.equalsIgnoreCase("h")) {
@@ -49,17 +109,17 @@ public class CmdLedger {
 			// F, T, B, D which require special parsing.
 			// parse response
 			char firstChar = cmd.toLowerCase().charAt(0);
-			String remainingCmd = cmd.substring(1).trim();//Drop first char and any whitespace.
+			String remainingCmd = cmd.substring(1).trim();// Drop first char and any whitespace.
 			switch (firstChar) {
 			case 'f':
 				try {
 					loadFromFile(session, remainingCmd);
 				} catch (FileNotFoundException e) {
-					System.err.println("Error: file " + remainingCmd.trim() +" cannot be opened for reading");
+					System.err.println("Error: file " + remainingCmd.trim() + " cannot be opened for reading");
 				}
 				break;
 			case 't':
-					session.addTransaction(remainingCmd);
+				session.addTransaction(remainingCmd);
 				break;
 			case 'b':
 				try {
@@ -82,24 +142,28 @@ public class CmdLedger {
 		}
 	}
 
-
 	public static void dumpFile(Ledger session, String remainingCmd) throws IOException {
 		FileOutputStream fs = new FileOutputStream(new File(remainingCmd.trim()));
-		for(Entry e : session.getBlockchain()) {
+		for (Entry e : session.getBlockchain()) {
 			fs.write(e.toString().getBytes());
 			fs.write("\n".getBytes());
 		}
 		fs.flush();
 		fs.close();
+		if(session.isVerbose()) {
+			System.out.println("File write complete!");
+		}
 	}
 
 	public static void loadFromFile(Ledger session, String remainingCmd) throws FileNotFoundException {
 		session.wipe();
 		Scanner fi = new Scanner(new File(remainingCmd));
-		while(fi.hasNextLine()) {
+		while (fi.hasNextLine()) {
 			session.addTransaction(fi.nextLine());
 		}
+		if(session.isVerbose()) {
+			System.out.println("File load complete!");
+		}
 	}
-	
-	
+
 }
