@@ -89,7 +89,6 @@ public class CmdLedger {
 				try {
 					dumpFile(session, remainingCmd);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				break;
