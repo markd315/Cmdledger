@@ -1,5 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class CmdLedger {
@@ -84,7 +86,12 @@ public class CmdLedger {
 				}
 				break;
 			case 'd':
-				dumpFile(session, remainingCmd);
+				try {
+					dumpFile(session, remainingCmd);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				break;
 			}
 
@@ -118,9 +125,14 @@ public class CmdLedger {
 	}
 
 
-	private static void dumpFile(Ledger session, String remainingCmd) {
-		// TODO Implement file dumping.
-		
+	private static void dumpFile(Ledger session, String remainingCmd) throws IOException {
+		FileOutputStream fs = new FileOutputStream(new File(remainingCmd.trim()));
+		for(Entry e : session.getBlockchain()) {
+			fs.write(e.toString().getBytes());
+			fs.write("\n".getBytes());
+		}
+		fs.flush();
+		fs.close();
 	}
 
 	private static void loadFromFile(Ledger session, String remainingCmd) throws FileNotFoundException {

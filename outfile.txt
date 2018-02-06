@@ -1,0 +1,4 @@
+root; 0; ; 1; (Alice, 6000)
+newt; 1; (root, 0); 2; (Sam, 3000)(Bob, 3000)
+newtt; 1; (newt, 0); 2; (Milo, 1500)(Band, 1500)
+consolidation; 3; (newt, 1)(newtt, 0)(newtt, 1); 1; (Consolidato, 6000)

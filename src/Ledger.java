@@ -209,10 +209,7 @@ public class Ledger {
 			}
 		}
 
-		if (e.sumOfIns() == 0) {
-			System.out.print("Transaction rejected, reason: ");
-			System.err.println("Empty input space");
-		} else if (e.sumOfOuts() == 0) {
+		if (e.sumOfOuts() == 0) {
 			System.out.print("Transaction rejected, reason: ");
 			System.err.println("Empty output space.");
 		} else if (e.sumOfIns() != e.sumOfOuts() && blockchain.size() > 0) {
