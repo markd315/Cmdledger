@@ -12,7 +12,8 @@ public class LedgerTest {
 	Ledger l;
 	@Before
 	public void callBefore(){
-		l = new Ledger();
+		Ledger.destroy();
+		l = Ledger.getInstance();
 	}
 	
 	@Test
@@ -26,7 +27,8 @@ public class LedgerTest {
 		assertTrue(l.calcBalance("Sam") == 0);
 		l.addTransaction("dump; 1; (newtt, 0); 2; (Alice, 1000)(Milo, 500)");
 		CmdLedger.dumpFile(l, "testoutputs.txt");
-		l = new Ledger();
+		Ledger.destroy();
+		Ledger.getInstance();
 		CmdLedger.loadFromFile(l, "testoutputs.txt");
 		assertTrue(l.getBlockchain().size() == 4);
 		assertTrue(l.calcBalance("Bob") == 3000);

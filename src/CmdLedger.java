@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class CmdLedger {
 
 	public static void main(String[] args) {
-		Ledger session = new Ledger();
+		Ledger session = Ledger.getInstance();
 		Scanner in = new Scanner(System.in);
 		while (true) {
 			if (session.isInteractive()) {

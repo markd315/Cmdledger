@@ -14,16 +14,34 @@ public class Ledger {
 	 * Example Transaction: 4787df35; 1;(f2cea539, 0);3; (Bob, 150)(Alice,
 	 * 845)(Gopesh, 5)
 	 */
-	public Ledger(Entry genesis) {
+	private static Ledger instance;
+
+	public static Ledger getInstance() {
+		if (instance != null)
+			return instance;
+		else {
+			instance = new Ledger();
+			return instance;
+		}
+	}
+
+	public static void destroy() {
+		instance = new Ledger();
+	}
+
+	private Ledger(Entry genesis) {
+
 		blockchain = new ArrayList<Entry>();
 		blockchain.add(genesis);
 		genesis.setParentLedger(this);
+		instance = this;
 	}
 
-	public Ledger() {
+	private Ledger() {
 		blockchain = new ArrayList<Entry>();
 		isInteractive = false;
 		isVerbose = false;
+		instance = this;
 	}
 
 	private boolean isInteractive, isVerbose;
@@ -61,10 +79,10 @@ public class Ledger {
 			// Does the output index location from the output list match the input.index?
 			// MATCHES? REMOVE IT FROM THE UNSPENT SET.
 		for (Iterator<Output> i = unspent.iterator(); i.hasNext();) {
-		    Output element = i.next();
-		    if (isSpentInAnyTransaction(element)) {
-		        i.remove();
-		    }
+			Output element = i.next();
+			if (isSpentInAnyTransaction(element)) {
+				i.remove();
+			}
 		}
 		// Iterate across the remaining set and sum the balance.
 		int sum = 0;
