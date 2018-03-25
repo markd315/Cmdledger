@@ -7,13 +7,10 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
-import javax.crypto.spec.SecretKeySpec;
 
 public class Identity {
 	private KeyPair keys;
@@ -86,7 +83,7 @@ public class Identity {
 		for(int i=0; i<secondLine.length()-1; i++) {
 			char a = secondLine.charAt(i);
 			char b = secondLine.charAt(i+1); //Big endian, each a is worth 16, each b is worth 1.
-			byte toAdd = (byte) (valFromHexChar(a)*16 + valFromHexChar(b));
+			byte toAdd = (byte) (valFromHexChar(a)*0x10 + valFromHexChar(b));
 			bytes.add(Byte.valueOf(toAdd));
 		}
 		byte[] ret = new byte[bytes.size()];
