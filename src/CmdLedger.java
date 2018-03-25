@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 public class CmdLedger {
@@ -152,7 +153,22 @@ public class CmdLedger {
 				//param txid, output OK or Bad.
 				break;
 			case 'r':
-				//params accountname, keyfilename
+				String[] accAndFileName = remainingCmd.split(" ");
+				String accountname = accAndFileName[0].trim();
+				String keyfile = accAndFileName[1].trim();
+				List<Identity> list= Identity.getPeople();
+				boolean found = false;
+				for(Identity i: list) {
+					if(i.getName().equals(accountname)) {
+						i.loadKeyPair(keyfile);
+						found = true;
+						break;
+					}
+				}
+				if(!found) {
+					Identity created = new Identity(accountname);
+					created.loadKeyPair(keyfile);
+				}
 				break;
 			}
 
