@@ -142,16 +142,16 @@ public class CmdLedger {
 					e.printStackTrace();
 				}
 				break;
-			case "o":
+			case 'o':
 				/*
 				 * collect all correctly signed transactions that have not been output in a previous transaction block and output them as a transaction block.  This outputs the current block only.  This includes outputting a line with a single integer indicating the number of signed transactions that follow, followed by those transactions.
 				 */
 				//TODO
 				break;
-			case "c":
+			case 'c':
 				//param txid, output OK or Bad.
 				break;
-			case "r":
+			case 'r':
 				//params accountname, keyfilename
 				break;
 			}
