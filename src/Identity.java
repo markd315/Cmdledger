@@ -37,6 +37,7 @@ public class Identity {
 		PrivateKey priv = kf.generatePrivate(new PKCS8EncodedKeySpec(bytesFromHex(firstLine)));
 		PublicKey pub = kf.generatePublic(new X509EncodedKeySpec(bytesFromHex(secondLine)));
 		KeyPair pair = new KeyPair(pub, priv);
+		this.keys = pair;
 		}
 		catch(Exception e) {
 			System.err.println();
