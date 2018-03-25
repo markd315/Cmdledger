@@ -95,7 +95,14 @@ public class CmdLedger {
 								+ "\r\n"
 								+ "[V]erbose: Toggle verbose mode. Start in non-verbose mode. In verbose mode, print additional diagnostic information as you wish. At all times, output each transaction number as it is read in, followed by a colon, a space, and the result (good or bad). \r\n"
 								+ "\r\n"
-								+ "[B]alance:  Supply username:  (e.g. Alice).  This command prints the current balance of a user.");
+								+ "[B]alance:  Supply username:  (e.g. Alice).  This command prints the current balance of a user."
+								+ "\r\n"
+								+ "[O]utput:  collect all correctly signed transactions that have not been output in a previous transaction block and output them as a transaction block.  This outputs the current block only."
+								+ "\r\n"
+								+ "[R]ead:  supply <account name> <keyfilename>. <account name is the name of the account associated with the key ."
+								+ "\r\n"
+								+ "[C]heck:  Supply <transactionID>:  The signature of the signed transaction (in the two-line format given above) shall be checked. Output OK to stdout if good, else output Bad to stdout. If bad, output additional diagnostic information to stderr."
+								);
 			}
 			if (cmd.equalsIgnoreCase("v")) {
 				session.setVerbose(!session.isVerbose());
