@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Entry {
 	private String id;
@@ -10,6 +9,18 @@ public class Entry {
 
 	public Entry(Ledger parent, List<Input> ins, List<Output> outs) {
 		this.inputs = ins;
+		//verify that all inputs come from the same user.
+		List<Output> referencedOutputs = new ArrayList<Output>();
+		for(Input i : inputs) {
+			referencedOutputs.add(parentLedger.lookupOutput(i));
+		}
+		String nameForAllInputs = referencedOutputs.get(0).getName();
+		for(Output o : referencedOutputs) {
+			if(!o.getName().equals(nameForAllInputs)) {
+				throw new IllegalArgumentException("Not all inputs are owned by the same user!");
+			}
+		}
+		
 		this.outputs = outs;
 	}
 

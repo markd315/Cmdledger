@@ -240,7 +240,7 @@ public class Ledger {
 			blockchain.add(e);
 	}
 
-	private Output lookupOutput(Input in) {
+	Output lookupOutput(Input in) {
 		for (Entry e : this.blockchain) {
 			if (e.getId().equals(in.getId())) {
 				return e.getOutputs().get(in.getIndex());

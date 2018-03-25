@@ -12,7 +12,7 @@ public class CmdLedger {
 		while (true) {
 			if (session.isInteractive()) {
 				System.out.println(
-						"Give a command! [H]elp, [E]xit, [P]rint, [W]ipe, [B]alance, [T]x [V]erbose, [I]nteractive, [F]ile, [D]ump");
+						"Give a command! [H]elp, [E]xit, [P]rint, [W]ipe, [B]alance, [T]x [V]erbose, [I]nteractive, [F]ile, [D]ump, [O]utput, [R]ead, [C]heck");
 			}
 			String cmd = in.nextLine();
 			if (session.isInteractive()) {
@@ -134,6 +134,18 @@ public class CmdLedger {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				break;
+			case "o":
+				/*
+				 * collect all correctly signed transactions that have not been output in a previous transaction block and output them as a transaction block.  This outputs the current block only.  This includes outputting a line with a single integer indicating the number of signed transactions that follow, followed by those transactions.
+				 */
+				//TODO
+				break;
+			case "c":
+				//param txid, output OK or Bad.
+				break;
+			case "r":
+				//params accountname, keyfilename
 				break;
 			}
 
