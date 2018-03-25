@@ -1,3 +1,13 @@
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.SecureRandom;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -6,9 +16,12 @@ public class Entry {
 	private Ledger parentLedger;
 	private List<Input> inputs;
 	private List<Output> outputs;
+	private Signature signature;
 	private static List<Entry> mempool;//These transactions have no block yet.
 	
+	
 	public Entry(Ledger parent, List<Input> ins, List<Output> outs) {
+		this.signature = null; //to be signed later.
 		this.inputs = ins;
 		//verify that all inputs come from the same user.
 		List<Output> referencedOutputs = new ArrayList<Output>();
@@ -29,7 +42,23 @@ public class Entry {
 		//We must call a genesis set on this constructor or add valid inputs or outputs for it to be accepted.
 		
 	}
-
+	public void setSignature(PrivateKey RSAPrivateKey) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException, SignatureException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectOutputStream writer = new ObjectOutputStream(baos);
+		writer.writeObject(this.inputs);
+		writer.writeObject(this.outputs);
+		writer.writeObject(this.id);
+		byte[] dataToSign = baos.toByteArray();
+		Signature signature = Signature.getInstance("SHA256withRSA", "BC");
+		signature.initSign(RSAPrivateKey, new SecureRandom());
+		signature.update(dataToSign);
+        signature.sign();
+        this.signature = signature;
+	}
+	public boolean verifySignature(String publickey) {
+		
+	}
+	
 	public void setParentLedger(Ledger l) {
 		this.parentLedger = l;
 	}
