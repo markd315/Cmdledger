@@ -6,7 +6,8 @@ public class Entry {
 	private Ledger parentLedger;
 	private List<Input> inputs;
 	private List<Output> outputs;
-
+	private static List<Entry> mempool;//These transactions have no block yet.
+	
 	public Entry(Ledger parent, List<Input> ins, List<Output> outs) {
 		this.inputs = ins;
 		//verify that all inputs come from the same user.
@@ -87,5 +88,10 @@ public class Entry {
 
 	public void setTxID(String string) {
 		this.id = string;
+	}
+
+	public static void addToMempool(Entry e) {
+		// TODO Auto-generated method stub
+		
 	}
 }

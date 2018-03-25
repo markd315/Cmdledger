@@ -29,16 +29,16 @@ public class Ledger {
 		instance = new Ledger();
 	}
 
-	private Ledger(Entry genesis) {
+	private Ledger(Block genesis) {
 
-		blockchain = new ArrayList<Entry>();
+		blockchain = new ArrayList<Block>();
 		blockchain.add(genesis);
 		genesis.setParentLedger(this);
 		instance = this;
 	}
 
 	private Ledger() {
-		blockchain = new ArrayList<Entry>();
+		blockchain = new ArrayList<Block>();
 		isInteractive = false;
 		isVerbose = false;
 		instance = this;
@@ -47,10 +47,18 @@ public class Ledger {
 	private boolean isInteractive, isVerbose;
 
 	public List<Entry> getBlockchain() {
+		List<Entry> ret = new ArrayList<Entry>();
+		for(Block b : blockchain) {
+			ret.add(b.getAllEntries());
+		}
+		return ret;
+	}
+	public List<Block> getBlockchainAsBlocks() {
 		return blockchain;
 	}
+	
 
-	private List<Entry> blockchain;
+	private List<Block> blockchain;
 
 	public void addTx(Entry e) {
 		if (e.sumOfIns() != e.sumOfOuts()) {
@@ -58,12 +66,12 @@ public class Ledger {
 			return;
 		}
 		e.setParentLedger(this);
-		blockchain.add(e);
+		Entry.addToMempool(e);
 	}
 
 	public int calcBalance(String username) throws Exception {
 		Set<Output> unspent = new HashSet<Output>();
-		for (Entry e : blockchain) {
+		for (Entry e : getBlockchain()) {
 			List<Output> outputs = e.getOutputs();
 			for (int i = 0; i < outputs.size(); i++) {
 				if (outputs.get(i).getName().equals(username)) { // We found one output of this transaction.
@@ -95,7 +103,7 @@ public class Ledger {
 	}
 
 	private boolean isSpentInAnyTransaction(Output op) {
-		for (Entry e : this.blockchain) {
+		for (Entry e : this.getBlockchain()) {
 			for (Input in : e.getInputs()) {
 				if (in.getId().equals(op.getId()) && in.getIndex() == op.indexInChain(this)) {
 					return true;
@@ -107,7 +115,7 @@ public class Ledger {
 
 	public String toString() {
 		String ret = "";
-		for (Entry e : blockchain) {
+		for (Entry e : this.getBlockchain()) {
 			ret += e;
 			ret += "\n";
 		}
@@ -217,7 +225,7 @@ public class Ledger {
 
 		// Verify sanity.
 		e.setParentLedger(this);
-		for (Entry old : this.blockchain) {
+		for (Entry old : this.getBlockchain()) {
 			if (old.getId().equals(e.getId())) {
 				System.err.println("Duplicate txid");
 				return;
@@ -237,11 +245,11 @@ public class Ledger {
 			System.out.print("Transaction rejected, reason: ");
 			System.err.println("Invalid spend or destruct of funds.");
 		} else
-			blockchain.add(e);
+			Entry.addToMempool(e);
 	}
 
 	Output lookupOutput(Input in) {
-		for (Entry e : this.blockchain) {
+		for (Entry e : this.getBlockchain()) {
 			if (e.getId().equals(in.getId())) {
 				return e.getOutputs().get(in.getIndex());
 			}
@@ -250,7 +258,7 @@ public class Ledger {
 	}
 
 	public void wipe() {
-		this.blockchain = new ArrayList<Entry>();
+		this.blockchain = new ArrayList<Block>();
 		System.gc();
 
 	}
