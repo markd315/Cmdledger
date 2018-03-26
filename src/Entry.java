@@ -5,6 +5,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
@@ -19,6 +20,9 @@ public class Entry {
 	private Signature signature;
 	private static List<Entry> mempool;//These transactions have no block yet.
 	
+	public static List<Entry> getMempool(){
+		return mempool;
+	}
 	
 	public Entry(Ledger parent, List<Input> ins, List<Output> outs) {
 		this.signature = null; //to be signed later.
@@ -34,7 +38,16 @@ public class Entry {
 				throw new IllegalArgumentException("Not all inputs are owned by the same user!");
 			}
 		}
-		
+		//Create identities if they do not exist.
+		List<Identity> ppl = Identity.getPeople();
+		for(Identity i : ppl) {
+			if(i.getName().equals(nameForAllInputs)) {
+				this.outputs = outs;
+				return;//We found the matching identity.
+			}
+		}
+		//If we reach this point, we need to make a new identity for signing transactions.
+		new Identity(nameForAllInputs);
 		this.outputs = outs;
 	}
 
@@ -55,8 +68,9 @@ public class Entry {
         signature.sign();
         this.signature = signature;
 	}
-	public boolean verifySignature(String publickey) {
-		
+	public boolean verifySignature(PublicKey publickey) {
+		throw new UnsupportedOperationException();
+		//TODO
 	}
 	
 	public void setParentLedger(Ledger l) {
@@ -120,7 +134,6 @@ public class Entry {
 	}
 
 	public static void addToMempool(Entry e) {
-		// TODO Auto-generated method stub
-		
+		mempool.add(e);
 	}
 }

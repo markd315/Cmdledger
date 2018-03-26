@@ -59,7 +59,11 @@ public class Ledger {
 	
 
 	private List<Block> blockchain;
-
+	
+	public void createBlock() {
+		//TODO
+	}
+	
 	public void addTx(Entry e) {
 		if (e.sumOfIns() != e.sumOfOuts()) {
 			System.out.println("Invalid transaction sum");

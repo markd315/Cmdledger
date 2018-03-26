@@ -19,6 +19,10 @@ public class LedgerTest {
 	@Test
 	public void canLoadAndDumpTxFromFile() throws Exception {
 		CmdLedger.loadFromFile(l, "testinputs.txt");
+		assertTrue(Entry.getMempool().size() == 3);
+		//sign txs and create a block.
+		//have to sign all three.
+		l.createBlock();
 		assertTrue(l.getBlockchain().size() == 3);
 		assertTrue(l.calcBalance("Bob") == 3000);
 		assertTrue(l.calcBalance("Milo") == 1500);

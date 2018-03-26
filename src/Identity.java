@@ -1,10 +1,15 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -25,6 +30,14 @@ public class Identity {
 		this.name = name;
 		allPeople.add(this);
 	}
+	public void sign(Entry e) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException {
+		e.setSignature(this.getPrivateKey());
+	}
+	
+	public boolean verify(Entry e) {
+		return e.verifySignature(this.getPublicKey());
+	}
+	
 	public void loadKeyPair(String filename) throws InvalidKeySpecException, NoSuchAlgorithmException, FileNotFoundException {
 		try {
 		Scanner fi = new Scanner(new File(filename));
