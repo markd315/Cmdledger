@@ -1,4 +1,6 @@
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -8,14 +10,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
-import java.util.Scanner;
 
 public class Identity {
 	private KeyPair keys;
@@ -33,28 +34,54 @@ public class Identity {
 
 	public void sign(Entry e) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,
 			SignatureException, IOException {
-		//TODO throw exception if signing an entry that isn't ours.
+		// TODO throw exception if signing an entry that isn't ours.
 		e.setSignature(this.getPrivateKey());
 	}
 
 	public boolean verify(Entry e) {
-		//TODO throw exception if verifying an entry that isn't ours.
+		// TODO throw exception if verifying an entry that isn't ours.
 		return e.verifySignature(this.getPublicKey());
 	}
 
 	public void loadKeyPair(String privfn, String pubfn)
 			throws InvalidKeySpecException, NoSuchAlgorithmException, FileNotFoundException {
 		try {
-			Scanner fipriv = new Scanner(new File(privfn));
-			Scanner fipub = new Scanner(new File(pubfn));
+			File f = new File(privfn);
+			FileInputStream fis = new FileInputStream(f);
+			DataInputStream dis = new DataInputStream(fis);
+			byte[] keyBytes = new byte[(int) f.length()];
+			dis.readFully(keyBytes);
+			dis.close();
 
-			String priv = fipriv.nextLine();// private
-			String pub = fipub.nextLine();// public
-			fipriv.close();
-			fipub.close();
+			String temp = new String(keyBytes);
+			String privKeyPEM = temp.replace("-----BEGIN PRIVATE KEY-----\n", "");
+			privKeyPEM = privKeyPEM.replace("-----END PRIVATE KEY-----", "");
+			// System.out.println("Private key\n"+privKeyPEM);
+
+			byte[] decoded = Base64.getDecoder().decode(privKeyPEM);
+
+			PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decoded);
 			KeyFactory kf = KeyFactory.getInstance("RSA");
-			PrivateKey privkey = kf.generatePrivate(new PKCS8EncodedKeySpec(bytesFromHex(priv)));
-			PublicKey pubkey = kf.generatePublic(new X509EncodedKeySpec(bytesFromHex(pub)));
+			PrivateKey privkey = kf.generatePrivate(spec);
+
+			f = new File(pubfn);
+			fis = new FileInputStream(f);
+			dis = new DataInputStream(fis);
+			keyBytes = new byte[(int) f.length()];
+			dis.readFully(keyBytes);
+			dis.close();
+
+			temp = new String(keyBytes);
+			String publicKeyPEM = temp.replace("-----BEGIN PUBLIC KEY-----\n", "");
+			publicKeyPEM = publicKeyPEM.replace("-----END PUBLIC KEY-----", "");
+
+			decoded = Base64.getDecoder().decode(publicKeyPEM);
+
+
+			X509EncodedKeySpec spec2 = new X509EncodedKeySpec(decoded);
+			kf = KeyFactory.getInstance("RSA");
+			PublicKey pubkey = kf.generatePublic(spec2);
+
 			KeyPair pair = new KeyPair(pubkey, privkey);
 			this.keys = pair;
 		} catch (Exception e) {
