@@ -33,10 +33,12 @@ public class Identity {
 
 	public void sign(Entry e) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,
 			SignatureException, IOException {
+		//TODO throw exception if signing an entry that isn't ours.
 		e.setSignature(this.getPrivateKey());
 	}
 
 	public boolean verify(Entry e) {
+		//TODO throw exception if verifying an entry that isn't ours.
 		return e.verifySignature(this.getPublicKey());
 	}
 
