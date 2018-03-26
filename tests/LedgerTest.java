@@ -10,18 +10,33 @@ import org.junit.Test;
 public class LedgerTest {
 
 	Ledger l;
+
 	@Before
-	public void callBefore(){
+	public void callBefore() {
 		Ledger.destroy();
 		l = Ledger.getInstance();
 	}
-	
+
 	@Test
 	public void canLoadAndDumpTxFromFile() throws Exception {
 		CmdLedger.loadFromFile(l, "testinputs.txt");
 		assertTrue(Entry.getMempool().size() == 3);
-		//sign txs and create a block.
-		//have to sign all three.
+		// Alice and Sam need to sign txs.
+
+		Identity alice, sam;//Just yank their references from the static list.
+		for (Identity i : Identity.getPeople()) {
+			if (i.getName().equalsIgnoreCase("Alice")) {
+				alice = i;
+			}
+			if (i.getName().equalsIgnoreCase("Sam")) {
+				sam = i;
+			}
+		}
+		alice.loadKeyPair("aliceprivate_key.pem", "alicepublic_key.pem");
+		
+		// sign txs and create a block.
+
+		// have to sign all three.
 		l.createBlock();
 		assertTrue(l.getBlockchain().size() == 3);
 		assertTrue(l.calcBalance("Bob") == 3000);
@@ -41,7 +56,7 @@ public class LedgerTest {
 		assertTrue(l.calcBalance("Alice") == 1000);
 		assertTrue(l.calcBalance("Sam") == 0);
 	}
-	
+
 	@Test
 	public void testWontAddBadlyFormattedTx() {
 		l.addTransaction("root; 0; 0; 0; 0; 0");
@@ -49,8 +64,9 @@ public class LedgerTest {
 		l.addTransaction("new; 2; (root, 0); 0; (Mark, 1000)");
 		l.addTransaction("root; 0; ; 3; (Mark, 1000)");
 		assertTrue(l.getBlockchain().size() == 0);
-		
+
 	}
+
 	@Test
 	public void testWillAddWellFormattedTx() throws Exception {
 		l.addTransaction("root; 0; ; 1; (Mark, 1000)");
@@ -61,6 +77,7 @@ public class LedgerTest {
 		assertTrue(l.calcBalance("Mateo") == 500);
 		assertTrue(l.calcBalance("Mark") == 500);
 	}
+
 	@Test
 	public void testWontAddDoubleSpendTx() throws Exception {
 		l.addTransaction("root; 0; ; 1; (Mark, 1000)");
@@ -71,6 +88,7 @@ public class LedgerTest {
 		assertTrue(l.calcBalance("Matt") == 1000);
 		assertTrue(l.calcBalance("Mateo") == 0);
 	}
+
 	@Test
 	public void testWontAddBadlyNamedTx() throws Exception {
 		l.addTransaction("root; 0; ; 1; (Mark, 1000)");
@@ -81,6 +99,7 @@ public class LedgerTest {
 		assertTrue(l.calcBalance("Matt") == 1000);
 		assertTrue(l.calcBalance("Mateo") == 0);
 	}
+
 	@Test
 	public void testWontAddUnbalancedTx() throws Exception {
 		l.addTransaction("root; 0; ; 1; (Mark, 1000)");
@@ -92,5 +111,5 @@ public class LedgerTest {
 		assertTrue(l.calcBalance("Matt") == 1000);
 		assertTrue(l.calcBalance("Mateo") == 0);
 	}
-	
+
 }

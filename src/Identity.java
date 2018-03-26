@@ -21,40 +21,48 @@ public class Identity {
 	private KeyPair keys;
 	private String name;
 	private static List<Identity> allPeople = new ArrayList<Identity>();
-	
-	public static List<Identity> getPeople(){
+
+	public static List<Identity> getPeople() {
 		return allPeople;
 	}
-	
+
 	public Identity(String name) {
 		this.name = name;
 		allPeople.add(this);
 	}
-	public void sign(Entry e) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException {
+
+	public void sign(Entry e) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,
+			SignatureException, IOException {
 		e.setSignature(this.getPrivateKey());
 	}
-	
+
 	public boolean verify(Entry e) {
 		return e.verifySignature(this.getPublicKey());
 	}
-	
-	public void loadKeyPair(String filename) throws InvalidKeySpecException, NoSuchAlgorithmException, FileNotFoundException {
+
+	public void loadKeyPair(String privfn, String pubfn)
+			throws InvalidKeySpecException, NoSuchAlgorithmException, FileNotFoundException {
 		try {
-		Scanner fi = new Scanner(new File(filename));
-		String firstLine = fi.nextLine();//private
-		String secondLine = fi.nextLine();//public
-		KeyFactory kf = KeyFactory.getInstance("RSA");
-		PrivateKey priv = kf.generatePrivate(new PKCS8EncodedKeySpec(bytesFromHex(firstLine)));
-		PublicKey pub = kf.generatePublic(new X509EncodedKeySpec(bytesFromHex(secondLine)));
-		KeyPair pair = new KeyPair(pub, priv);
-		this.keys = pair;
-		}
-		catch(Exception e) {
+			Scanner fipriv = new Scanner(new File(privfn));
+			Scanner fipub = new Scanner(new File(pubfn));
+
+			String priv = fipriv.nextLine();// private
+			String pub = fipub.nextLine();// public
+			fipriv.close();
+			fipub.close();
+			KeyFactory kf = KeyFactory.getInstance("RSA");
+			PrivateKey privkey = kf.generatePrivate(new PKCS8EncodedKeySpec(bytesFromHex(priv)));
+			PublicKey pubkey = kf.generatePublic(new X509EncodedKeySpec(bytesFromHex(pub)));
+			KeyPair pair = new KeyPair(pubkey, privkey);
+			this.keys = pair;
+		} catch (Exception e) {
 			System.err.println();
 		}
+
 	}
+
 	private byte valFromHexChar(char hex) {
-		switch(hex) {
+		switch (hex) {
 		case '0':
 			return 0;
 		case '1':
@@ -90,17 +98,18 @@ public class Identity {
 		}
 		return 0;
 	}
+
 	private byte[] bytesFromHex(String secondLine) {
 		secondLine = secondLine.toLowerCase();
-		List<Byte> bytes = new ArrayList<Byte>(); 
-		for(int i=0; i<secondLine.length()-1; i++) {
+		List<Byte> bytes = new ArrayList<Byte>();
+		for (int i = 0; i < secondLine.length() - 1; i++) {
 			char a = secondLine.charAt(i);
-			char b = secondLine.charAt(i+1); //Big endian, each a is worth 16, each b is worth 1.
-			byte toAdd = (byte) (valFromHexChar(a)*0x10 + valFromHexChar(b));
+			char b = secondLine.charAt(i + 1); // Big endian, each a is worth 16, each b is worth 1.
+			byte toAdd = (byte) (valFromHexChar(a) * 0x10 + valFromHexChar(b));
 			bytes.add(Byte.valueOf(toAdd));
 		}
 		byte[] ret = new byte[bytes.size()];
-		for(int i=0; i<bytes.size(); i++) {
+		for (int i = 0; i < bytes.size(); i++) {
 			ret[i] = bytes.get(i).byteValue();
 		}
 		return ret;
@@ -109,6 +118,7 @@ public class Identity {
 	public PrivateKey getPrivateKey() {
 		return keys.getPrivate();
 	}
+
 	public PublicKey getPublicKey() {
 		return keys.getPublic();
 	}
