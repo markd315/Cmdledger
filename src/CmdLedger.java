@@ -2,12 +2,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.Scanner;
 
 public class CmdLedger {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InvalidKeySpecException, NoSuchAlgorithmException, FileNotFoundException {
 		Ledger session = Ledger.getInstance();
 		Scanner in = new Scanner(System.in);
 		while (true) {
@@ -155,19 +157,20 @@ public class CmdLedger {
 			case 'r':
 				String[] accAndFileName = remainingCmd.split(" ");
 				String accountname = accAndFileName[0].trim();
-				String keyfile = accAndFileName[1].trim();
+				String privkeyfile = accAndFileName[1].trim();
+				String pubkeyfile = accAndFileName[2].trim();
 				List<Identity> list= Identity.getPeople();
 				boolean found = false;
 				for(Identity i: list) {
 					if(i.getName().equals(accountname)) {
-						i.loadKeyPair(keyfile);
+						i.loadKeyPair(privkeyfile, pubkeyfile);
 						found = true;
 						break;
 					}
 				}
 				if(!found) {
 					Identity created = new Identity(accountname);
-					created.loadKeyPair(keyfile);
+					created.loadKeyPair(privkeyfile, pubkeyfile);
 				}
 				break;
 			}

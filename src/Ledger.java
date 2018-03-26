@@ -49,7 +49,7 @@ public class Ledger {
 	public List<Entry> getBlockchain() {
 		List<Entry> ret = new ArrayList<Entry>();
 		for(Block b : blockchain) {
-			ret.add(b.getAllEntries());
+			ret.addAll(b.getAllEntries());
 		}
 		return ret;
 	}
