@@ -1,3 +1,4 @@
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -48,22 +49,40 @@ public class Ledger {
 
 	public List<Entry> getBlockchain() {
 		List<Entry> ret = new ArrayList<Entry>();
-		for(Block b : blockchain) {
+		for (Block b : blockchain) {
 			ret.addAll(b.getAllEntries());
 		}
 		return ret;
 	}
+
 	public List<Block> getBlockchainAsBlocks() {
 		return blockchain;
 	}
-	
 
 	private List<Block> blockchain;
-	
+
 	public void createBlock() {
-		//TODO
+		List<Entry> validAdding = new ArrayList<Entry>();
+		for (Entry e : Entry.getMempool()) {
+			if (e.getInputs().size() == 0 && this.blockchain.size() == 0) {// Genesis.
+				List<Entry> singletx = new ArrayList<Entry>();
+				singletx.add(e);
+				Block genesis = new Block(singletx);
+				this.blockchain.add(genesis);
+			} else {
+				String person = this.lookupOutput(e.getInputs().get(0)).getName();
+				PublicKey pkToVerifyWith = Identity.lookupWithName(person).getPublicKey();
+				if (e.verifySignature(pkToVerifyWith)) {
+					//TODO anything else I need to check?
+					validAdding.add(e);//If that's all...
+				}
+			}
+		}
+		Block newBlock = new Block(validAdding);
+		this.blockchain.add(newBlock);
+
 	}
-	
+
 	public void addTx(Entry e) {
 		if (e.sumOfIns() != e.sumOfOuts()) {
 			System.out.println("Invalid transaction sum");

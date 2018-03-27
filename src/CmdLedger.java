@@ -35,6 +35,7 @@ public class CmdLedger {
 							System.out.println("Please add a transaction with no inputs, like \"root; 0; ; 1; (God, 1000)\"");
 							System.out.println("Please note that unbalanced transactions of this type are not usually allowed.");
 						}
+						//TODO MAKE SURE we allow a digital signature along with the tx.
 					}
 					System.out.println("Which transaction name?");
 					cmd += " " + in.nextLine() + "; ";

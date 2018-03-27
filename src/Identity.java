@@ -32,6 +32,21 @@ public class Identity {
 		allPeople.add(this);
 	}
 
+	public static Identity lookupWithName(String n) {
+		try {
+			for (Identity i : allPeople) {
+
+				if (i.getName().equalsIgnoreCase(n)) {
+					return i;
+				}
+			}
+		} catch (Exception e) {
+			System.err.println("Invalid person lookup!");
+
+		}
+		return null;
+	}
+
 	public void sign(Entry e) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,
 			SignatureException, IOException {
 		// TODO throw exception if signing an entry that isn't ours.
@@ -76,7 +91,6 @@ public class Identity {
 			publicKeyPEM = publicKeyPEM.replace("-----END PUBLIC KEY-----", "");
 
 			decoded = Base64.getDecoder().decode(publicKeyPEM);
-
 
 			X509EncodedKeySpec spec2 = new X509EncodedKeySpec(decoded);
 			kf = KeyFactory.getInstance("RSA");
