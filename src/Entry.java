@@ -18,7 +18,7 @@ public class Entry {
 	private List<Input> inputs;
 	private List<Output> outputs;
 	private Signature signature;
-	private static List<Entry> mempool;//These transactions have no block yet.
+	private static List<Entry> mempool = new ArrayList<Entry>();//These transactions have no block yet.
 	
 	public static List<Entry> getMempool(){
 		return mempool;
@@ -27,10 +27,17 @@ public class Entry {
 	public Entry(Ledger parent, List<Input> ins, List<Output> outs) {
 		this.signature = null; //to be signed later.
 		this.inputs = ins;
+		this.parentLedger = parent;
 		//verify that all inputs come from the same user.
 		List<Output> referencedOutputs = new ArrayList<Output>();
 		for(Input i : inputs) {
 			referencedOutputs.add(parentLedger.lookupOutput(i));
+		}
+		if(referencedOutputs.size() == 0 && parentLedger.getBlockchain().size() == 0) {
+			//If we are at the genesis transaction.
+			this.outputs = outs;
+			this.inputs = new ArrayList<Input>();
+			return;
 		}
 		String nameForAllInputs = referencedOutputs.get(0).getName();
 		for(Output o : referencedOutputs) {
