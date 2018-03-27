@@ -1,3 +1,6 @@
+LIVE VERSION OF THIS REPO IS UNDER DEV AND BROKEN:
+Last stable build: https://github.com/markd315/Cmdledger/commit/6295123bf7b4d69844e659ea47a1b2fc924dbe99
+
 This repository can be cloned or downloaded.
 
 There is a makefile within the src or bin directory that will create a jarfile also within that directory.
