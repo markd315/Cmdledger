@@ -63,15 +63,16 @@ public class Identity {
 			dis.readFully(keyBytes);
 			dis.close();
 
-			String temp = new String(keyBytes);
+			String temp = new String(keyBytes, "US-ASCII");
 			String privKeyPEM = temp.replace("-----BEGIN PRIVATE KEY-----\n", "");
-			privKeyPEM = privKeyPEM.replace("-----END PRIVATE KEY-----", "").trim();
+			privKeyPEM = privKeyPEM.replace("-----END PRIVATE KEY-----", "").replace("\\", "").trim();
 			//TODO error here.
-			byte[] decoded = Base64.getDecoder().decode(privKeyPEM);
+			
+			byte[] decoded = Base64.getDecoder().decode(new String(privKeyPEM).getBytes("UTF-8"));
+	        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
 
-			PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decoded);
 			KeyFactory kf = KeyFactory.getInstance("RSA");
-			PrivateKey privkey = kf.generatePrivate(spec);
+			PrivateKey privkey = kf.generatePrivate(keySpec);
 
 			f = new File(pubfn);
 			fis = new FileInputStream(f);
@@ -83,8 +84,8 @@ public class Identity {
 			temp = new String(keyBytes);
 			String publicKeyPEM = temp.replace("-----BEGIN PUBLIC KEY-----\n", "");
 			publicKeyPEM = publicKeyPEM.replace("-----END PUBLIC KEY-----", "");
-
-			decoded = Base64.getDecoder().decode(publicKeyPEM);
+			
+            decoded = Base64.getDecoder().decode(new String(publicKeyPEM).getBytes("UTF-8"));
 
 			X509EncodedKeySpec spec2 = new X509EncodedKeySpec(decoded);
 			kf = KeyFactory.getInstance("RSA");
@@ -93,7 +94,7 @@ public class Identity {
 			KeyPair pair = new KeyPair(pubkey, privkey);
 			this.keys = pair;
 		} catch (Exception e) {
-			System.err.println("Error loading in keys!");
+			System.err.println("Error loading in keys!" + e);
 		}
 
 	}
