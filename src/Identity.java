@@ -33,19 +33,14 @@ public class Identity {
 	}
 
 	public static Identity lookupWithName(String n) {
-		try {
 			for (Identity i : allPeople) {
 
 				if (i.getName().equalsIgnoreCase(n)) {
 					return i;
 				}
 			}
-		} catch (Exception e) {
-			System.err.println("Invalid person lookup!");
-
+			return new Identity(n);
 		}
-		return null;
-	}
 
 	public void sign(Entry e) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,
 			SignatureException, IOException {
@@ -70,9 +65,8 @@ public class Identity {
 
 			String temp = new String(keyBytes);
 			String privKeyPEM = temp.replace("-----BEGIN PRIVATE KEY-----\n", "");
-			privKeyPEM = privKeyPEM.replace("-----END PRIVATE KEY-----", "");
-			// System.out.println("Private key\n"+privKeyPEM);
-
+			privKeyPEM = privKeyPEM.replace("-----END PRIVATE KEY-----", "").trim();
+			//TODO error here.
 			byte[] decoded = Base64.getDecoder().decode(privKeyPEM);
 
 			PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decoded);
@@ -99,7 +93,7 @@ public class Identity {
 			KeyPair pair = new KeyPair(pubkey, privkey);
 			this.keys = pair;
 		} catch (Exception e) {
-			System.err.println();
+			System.err.println("Error loading in keys!");
 		}
 
 	}

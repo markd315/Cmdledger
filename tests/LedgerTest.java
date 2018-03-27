@@ -23,14 +23,9 @@ public class LedgerTest {
 		// Alice and Sam need to sign txs.
 
 		Identity alice=null, sam=null;//Just yank their references from the static list.
-		for (Identity i : Identity.getPeople()) {
-			if (i.getName().equalsIgnoreCase("Alice")) {
-				alice = i;
-			}
-			if (i.getName().equalsIgnoreCase("Sam")) {
-				sam = i;
-			}
-		}
+		alice = Identity.lookupWithName("Alice");
+		sam = Identity.lookupWithName("Sam");
+		
 		assertNotNull(alice);
 		assertNotNull(sam);
 		alice.loadKeyPair("aliceprivate_key.pem", "alicepublic_key.pem");

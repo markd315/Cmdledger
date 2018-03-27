@@ -33,7 +33,7 @@ public class Entry {
 		for(Input i : inputs) {
 			referencedOutputs.add(parentLedger.lookupOutput(i));
 		}
-		if(referencedOutputs.size() == 0 && parentLedger.getBlockchain().size() == 0) {
+		if((referencedOutputs.size() == 0 || referencedOutputs.get(0) == null )&& parentLedger.getBlockchain().size() == 0) {
 			//If we are at the genesis transaction.
 			this.outputs = outs;
 			this.inputs = new ArrayList<Input>();
