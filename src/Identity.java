@@ -2,10 +2,14 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -32,15 +36,25 @@ public class Identity {
 		allPeople.add(this);
 	}
 
-	public static Identity lookupWithName(String n) {
-			for (Identity i : allPeople) {
+	public void generateAndDumpKeys() throws NoSuchAlgorithmException, IOException {
+		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+		keyGen.initialize(512);
+		this.keys = keyGen.generateKeyPair();
+		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(this.name + "_keypair.ser"));
+		out.writeObject(this.keys);
+		out.close();
 
-				if (i.getName().equalsIgnoreCase(n)) {
-					return i;
-				}
+	}
+
+	public static Identity lookupWithName(String n) {
+		for (Identity i : allPeople) {
+
+			if (i.getName().equalsIgnoreCase(n)) {
+				return i;
 			}
-			return new Identity(n);
 		}
+		return new Identity(n);
+	}
 
 	public void sign(Entry e) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,
 			SignatureException, IOException {
@@ -53,50 +67,15 @@ public class Identity {
 		return e.verifySignature(this.getPublicKey());
 	}
 
-	public void loadKeyPair(String privfn, String pubfn)
-			throws InvalidKeySpecException, NoSuchAlgorithmException, FileNotFoundException {
+	public void loadKeyPair(String keypairFile) {
 		try {
-			File f = new File(privfn);
-			FileInputStream fis = new FileInputStream(f);
-			DataInputStream dis = new DataInputStream(fis);
-			byte[] keyBytes = new byte[(int) f.length()];
-			dis.readFully(keyBytes);
-			dis.close();
-
-			String temp = new String(keyBytes, "US-ASCII");
-			String privKeyPEM = temp.replace("-----BEGIN PRIVATE KEY-----\n", "");
-			privKeyPEM = privKeyPEM.replace("-----END PRIVATE KEY-----", "").replace("\\", "").trim();
-			//TODO error here.
-			
-			byte[] decoded = Base64.getDecoder().decode(new String(privKeyPEM).getBytes("UTF-8"));
-	        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
-
-			KeyFactory kf = KeyFactory.getInstance("RSA");
-			PrivateKey privkey = kf.generatePrivate(keySpec);
-
-			f = new File(pubfn);
-			fis = new FileInputStream(f);
-			dis = new DataInputStream(fis);
-			keyBytes = new byte[(int) f.length()];
-			dis.readFully(keyBytes);
-			dis.close();
-
-			temp = new String(keyBytes);
-			String publicKeyPEM = temp.replace("-----BEGIN PUBLIC KEY-----\n", "");
-			publicKeyPEM = publicKeyPEM.replace("-----END PUBLIC KEY-----", "");
-			
-            decoded = Base64.getDecoder().decode(new String(publicKeyPEM).getBytes("UTF-8"));
-
-			X509EncodedKeySpec spec2 = new X509EncodedKeySpec(decoded);
-			kf = KeyFactory.getInstance("RSA");
-			PublicKey pubkey = kf.generatePublic(spec2);
-
-			KeyPair pair = new KeyPair(pubkey, privkey);
-			this.keys = pair;
+			FileInputStream door = new FileInputStream(keypairFile);
+			ObjectInputStream reader = new ObjectInputStream(door);
+			this.keys = (KeyPair) reader.readObject();
+			reader.close();
 		} catch (Exception e) {
-			System.err.println("Error loading in keys!" + e);
+			System.err.println("Error reading in key serialization");
 		}
-
 	}
 
 	private byte valFromHexChar(char hex) {

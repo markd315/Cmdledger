@@ -15,6 +15,16 @@ public class CmdLedger {
 			throws InvalidKeySpecException, NoSuchAlgorithmException, FileNotFoundException {
 		Ledger session = Ledger.getInstance();
 		Scanner in = new Scanner(System.in);
+		Identity alice = new Identity("Alice");
+		Identity sam = new Identity("Sam");
+		try {
+			alice.generateAndDumpKeys();
+			sam.generateAndDumpKeys();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		while (true) {
 			if (session.isInteractive()) {
 				System.out.println(
@@ -191,7 +201,6 @@ public class CmdLedger {
 				}
 				break;
 			}
-
 			// execute library command.
 
 		}
