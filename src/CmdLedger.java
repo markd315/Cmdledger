@@ -147,10 +147,7 @@ public class CmdLedger {
 				}
 				break;
 			case 'o':
-				/*
-				 * collect all correctly signed transactions that have not been output in a previous transaction block and output them as a transaction block.  This outputs the current block only.  This includes outputting a line with a single integer indicating the number of signed transactions that follow, followed by those transactions.
-				 */
-				//TODO
+				session.createBlock();
 				break;
 			case 'c':
 				//param txid, output OK or Bad.
