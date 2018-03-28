@@ -76,12 +76,13 @@ public class Ledger {
 				}
 			}
 		}
-		for(Entry e : addingInThisBlock) {
-			Entry.getMempool().remove(e);//These are no longer waiting to be added.
+		for (Entry e : addingInThisBlock) {
+			Entry.getMempool().remove(e);// These are no longer waiting to be added.
 		}
 		Block newBlock = new Block(addingInThisBlock);
 		newBlock.setParentLedger(this);
-		addingInThisBlock = new ArrayList<Entry>(); //Drop this reference and start over for next time this method is called.
+		addingInThisBlock = new ArrayList<Entry>(); // Drop this reference and start over for next time this method is
+													// called.
 		this.blockchain.add(newBlock);
 
 	}
@@ -165,7 +166,6 @@ public class Ledger {
 		this.isInteractive = isInteractive;
 	}
 
-	// 4787df35; 1;(f2cea539, 0);3; (Bob, 150)(Alice, 845)(Gopesh, 5)
 	public void addTransaction(String remainingCmd) {
 		// Break the String into 5 parts by split;
 		String[] split = remainingCmd.split(";");
@@ -236,8 +236,20 @@ public class Ledger {
 			o.setEntry(e);
 		}
 		e.setTxID(split[0]);
+		// We need a way to load in the byte[] signature from a dumped file.
+		byte[] signature = recombineString(split, 5).getBytes();// We might need this call if there are ASCII ' ' spaces
+																// in the dumped byte[]
+		e.reloadSignature(signature);
 		this.addTransaction(e);
 		return;
+	}
+
+	private String recombineString(String[] split, int i) {
+		String ret = "";
+		for (; i < split.length; i++) {
+			ret += split[i];
+		}
+		return ret;
 	}
 
 	// This needs to handle geneses and check them to see if they are the first

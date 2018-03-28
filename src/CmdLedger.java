@@ -4,8 +4,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.Signature;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -15,12 +15,50 @@ public class CmdLedger {
 			throws InvalidKeySpecException, NoSuchAlgorithmException, FileNotFoundException {
 		Ledger session = Ledger.getInstance();
 		Scanner in = new Scanner(System.in);
-		/*
-		 * Identity alice = new Identity("Alice"); Identity sam = new Identity("Sam");
-		 * try { alice.generateAndDumpKeys(); sam.generateAndDumpKeys(); } catch
-		 * (IOException e1) { // TODO Auto-generated catch block e1.printStackTrace(); }
-		 */
+		// For initing some keys.
 
+		Identity alice = new Identity("Alice");
+		Identity sam = new Identity("Sam");
+		try {
+			alice.generateAndDumpKeys();
+			sam.generateAndDumpKeys();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		// For initing some signed transaction examples.
+		try {
+		List<Input> ins = new ArrayList<Input>();
+		List<Output> outs = new ArrayList<Output>();
+		outs.add(new Output("Alice", 6000, null));
+		Entry ex = new Entry(session, ins, outs);
+		ex.setTxID("root");
+		session.addTransaction(ex);
+		session.createBlock();
+		ins = new ArrayList<Input>();
+		outs = new ArrayList<Output>();
+		ins.add(new Input("root", 0));
+		outs.add(new Output("Sam", 3000, null));
+		outs.add(new Output("Bob", 3000, null));
+		ex = new Entry(session, ins, outs);
+		ex.setTxID("newt");
+		session.addTransaction(ex);
+		alice.sign(ex);
+		session.createBlock();
+		ins = new ArrayList<Input>();
+		outs = new ArrayList<Output>();
+		ins.add(new Input("newt", 0));
+		outs.add(new Output("Milo", 1500, null));
+		outs.add(new Output("Band", 1500, null));
+		ex = new Entry(session, ins, outs);
+		ex.setTxID("newtt");
+		session.addTransaction(ex);
+		sam.sign(ex);
+		session.createBlock();
+		dumpFile(session, "testinputs.txt");
+		}
+		catch(Exception e) {
+			System.err.println("fuck...");
+		}
 		while (true) {
 			if (session.isInteractive()) {
 				System.out.println(

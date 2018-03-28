@@ -122,6 +122,7 @@ public class Entry {
 		for (int i = 0; i < outputs.size(); i++) {
 			ret += "(" + outputs.get(i).getName() + ", " + outputs.get(i).getAmount() + ")";
 		}
+		ret+=this.signature;
 		return ret;
 	}
 
@@ -174,5 +175,9 @@ public class Entry {
 
 	public byte[] getSignature() {
 		return signature;
+	}
+
+	public void reloadSignature(byte[] signature) {
+		this.signature = signature;
 	}
 }
