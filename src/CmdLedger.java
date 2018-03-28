@@ -3,13 +3,16 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.Scanner;
 
 public class CmdLedger {
 
-	public static void main(String[] args) throws InvalidKeySpecException, NoSuchAlgorithmException, FileNotFoundException {
+	public static void main(String[] args)
+			throws InvalidKeySpecException, NoSuchAlgorithmException, FileNotFoundException {
 		Ledger session = Ledger.getInstance();
 		Scanner in = new Scanner(System.in);
 		while (true) {
@@ -30,12 +33,14 @@ public class CmdLedger {
 				case "t":
 					if (session.isVerbose()) {
 						System.out.println("Transaction add initiated!");
-						if(session.getBlockchain().size() == 0) {
+						if (session.getBlockchain().size() == 0) {
 							System.out.println("Your blockchain is empty and needs a genesis transaction.");
-							System.out.println("Please add a transaction with no inputs, like \"root; 0; ; 1; (God, 1000)\"");
-							System.out.println("Please note that unbalanced transactions of this type are not usually allowed.");
+							System.out.println(
+									"Please add a transaction with no inputs, like \"root; 0; ; 1; (God, 1000)\"");
+							System.out.println(
+									"Please note that unbalanced transactions of this type are not usually allowed.");
 						}
-						//TODO MAKE SURE we allow a digital signature along with the tx.
+						// TODO MAKE SURE we allow a digital signature along with the tx.
 					}
 					System.out.println("Which transaction name?");
 					cmd += " " + in.nextLine() + "; ";
@@ -70,7 +75,7 @@ public class CmdLedger {
 				}
 			}
 			if (cmd.equalsIgnoreCase("e")) {
-				if(session.isVerbose()) {
+				if (session.isVerbose()) {
 					System.out.println("Exiting!");
 				}
 				break;
@@ -80,7 +85,7 @@ public class CmdLedger {
 				System.out.println(session);
 			} // Print ledger
 			if (cmd.equalsIgnoreCase("w")) {
-				if(session.isVerbose()) {
+				if (session.isVerbose()) {
 					System.out.println("Session wiping!");
 				}
 				session.wipe();
@@ -105,8 +110,7 @@ public class CmdLedger {
 								+ "\r\n"
 								+ "[R]ead:  supply <account name> <keyfilename>. <account name is the name of the account associated with the key ."
 								+ "\r\n"
-								+ "[C]heck:  Supply <transactionID>:  The signature of the signed transaction (in the two-line format given above) shall be checked. Output OK to stdout if good, else output Bad to stdout. If bad, output additional diagnostic information to stderr."
-								);
+								+ "[C]heck:  Supply <transactionID>:  The signature of the signed transaction (in the two-line format given above) shall be checked. Output OK to stdout if good, else output Bad to stdout. If bad, output additional diagnostic information to stderr.");
 			}
 			if (cmd.equalsIgnoreCase("v")) {
 				session.setVerbose(!session.isVerbose());
@@ -150,23 +154,38 @@ public class CmdLedger {
 				session.createBlock();
 				break;
 			case 'c':
-				//param txid, output OK or Bad.
+				try {
+					Entry e = session.lookupWithId(remainingCmd);
+					Output o = session.lookupOutput(e.getInputs().get(0));
+					Identity i = Identity.lookupWithName(o.getName());
+					PublicKey pubkey = i.getPublicKey();
+					if (e.verifySignature(pubkey)) {// Just verify the signature.
+						System.out.println("OK");
+					} else {
+						System.out.println("Bad");
+						System.out.println("No public key was able to sign for this transaction.");
+					}
+				} catch (Exception e) {
+					System.err.println("Error verifying signature.");
+				}
+
+				// param txid, output OK or Bad.
 				break;
 			case 'r':
 				String[] accAndFileName = remainingCmd.split(" ");
 				String accountname = accAndFileName[0].trim();
 				String privkeyfile = accAndFileName[1].trim();
 				String pubkeyfile = accAndFileName[2].trim();
-				List<Identity> list= Identity.getPeople();
+				List<Identity> list = Identity.getPeople();
 				boolean found = false;
-				for(Identity i: list) {
-					if(i.getName().equals(accountname)) {
+				for (Identity i : list) {
+					if (i.getName().equals(accountname)) {
 						i.loadKeyPair(privkeyfile, pubkeyfile);
 						found = true;
 						break;
 					}
 				}
-				if(!found) {
+				if (!found) {
 					Identity created = new Identity(accountname);
 					created.loadKeyPair(privkeyfile, pubkeyfile);
 				}
@@ -186,7 +205,7 @@ public class CmdLedger {
 		}
 		fs.flush();
 		fs.close();
-		if(session.isVerbose()) {
+		if (session.isVerbose()) {
 			System.out.println("File write complete!");
 		}
 	}
@@ -197,7 +216,7 @@ public class CmdLedger {
 		while (fi.hasNextLine()) {
 			session.addTransaction(fi.nextLine());
 		}
-		if(session.isVerbose()) {
+		if (session.isVerbose()) {
 			System.out.println("File load complete!");
 		}
 	}

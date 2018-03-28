@@ -286,4 +286,13 @@ public class Ledger {
 
 	}
 
+	public Entry lookupWithId(String txid) {
+		for(Entry e : this.getBlockchain()) {
+			if(e.getId().equals(txid)) {
+				return e;
+			}
+		}
+		return null;
+	}
+
 }
