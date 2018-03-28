@@ -26,6 +26,12 @@ public class Entry {
 
 	public Entry(Ledger parent, List<Input> ins, List<Output> outs) {
 		this.signature = null; // to be signed later.
+		if(ins == null) {
+			ins = new ArrayList<Input>();
+		}
+		if(outs == null) {
+			outs = new ArrayList<Output>();
+		}
 		this.inputs = ins;
 		this.parentLedger = parent;
 		// verify that all inputs come from the same user.
@@ -37,7 +43,6 @@ public class Entry {
 				&& parentLedger.getBlockchain().size() == 0) {
 			// If we are at the genesis transaction.
 			this.outputs = outs;
-			this.inputs = new ArrayList<Input>();
 			return;
 		}
 		String nameForAllInputs = referencedOutputs.get(0).getName();

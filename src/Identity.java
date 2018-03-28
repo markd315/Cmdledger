@@ -57,11 +57,12 @@ public class Identity {
 	}
 
 	public void sign(Entry e) throws Exception {
-		//TODO line throws IOOB
 		if(e.getInputs().size() == 0 && Ledger.getInstance().getBlockchain().size() == 0) {
 			return;//Genesis
 		}
-		Output toFindName = Ledger.getInstance().lookupOutput(e.getInputs().get(0));
+		//TODO toFindName gets set NULL.
+		Input toLookup = e.getInputs().get(0);
+		Output toFindName = Ledger.getInstance().lookupOutput(toLookup);
 		String name = toFindName.getName();
 		if(!this.name.equalsIgnoreCase(name)) {
 			System.err.println("Not going to sign for someone elses transaction!");

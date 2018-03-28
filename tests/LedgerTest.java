@@ -21,7 +21,7 @@ public class LedgerTest {
 		CmdLedger.loadFromFile(l, "testinputs.txt");
 		assertTrue(Entry.getMempool().size() == 3);
 		// Alice and Sam need to sign txs.
-
+		//TODO Alice and Sam transactions weirdly have no inputs. Double-spend?
 		Identity alice=null, sam=null;//Just yank their references from the static list.
 		alice = Identity.lookupWithName("Alice");
 		sam = Identity.lookupWithName("Sam");
@@ -34,7 +34,9 @@ public class LedgerTest {
 		Entry aliceToSign = mempool.get(1);
 		Entry samToSign = mempool.get(2);
 		// sign txs and create a block.
+		l.createBlock();//Alice cannot sign for a UTXO that is still in the mempool, so we need to make a block first.
 		alice.sign(aliceToSign);
+		l.createBlock();//Sam cannot sign for a UTXO that is still in the mempool.
 		sam.sign(samToSign);
 		// have to sign all but the genesis.
 		l.createBlock();

@@ -1,5 +1,10 @@
+import java.io.Serializable;
 
-public class Input {
+public class Input implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1008236880333943238L;
 	private String id;
 	private int index;
 
