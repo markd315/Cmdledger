@@ -67,6 +67,7 @@ public class Ledger {
 		for (Entry e : Entry.getMempool()) {
 			if (e.getInputs().size() == 0 && this.blockchain.size() == 0) {// Genesis.
 				addingInThisBlock.add(e);
+				break;
 			} else {
 				String person = this.lookupOutput(e.getInputs().get(0)).getName();
 				PublicKey pkToVerifyWith = Identity.lookupWithName(person).getPublicKey();
@@ -80,6 +81,7 @@ public class Ledger {
 		}
 		Block newBlock = new Block(addingInThisBlock);
 		newBlock.setParentLedger(this);
+		addingInThisBlock = new ArrayList<Entry>(); //Drop this reference and start over for next time this method is called.
 		this.blockchain.add(newBlock);
 
 	}

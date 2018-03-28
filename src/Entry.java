@@ -79,13 +79,16 @@ public class Entry {
 		writer.writeObject(this.outputs);
 		writer.writeObject(this.id);
 		byte[] dataToSign = baos.toByteArray();
-		Signature signature = Signature.getInstance("SHA256withRSA", "BC");
+		Signature signature = Signature.getInstance("SHA256withRSA");
 		signature.initSign(RSAPrivateKey, new SecureRandom());
 		signature.update(dataToSign);
 		this.signature = signature.sign();
 	}
 
 	public boolean verifySignature(PublicKey publickey) {
+		if(this.signature == null) {
+			return false;
+		}
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ObjectOutputStream writer = new ObjectOutputStream(baos);
@@ -93,7 +96,8 @@ public class Entry {
 			writer.writeObject(this.outputs);
 			writer.writeObject(this.id);
 			byte[] dataToVerify = baos.toByteArray();
-			Signature localSignature = Signature.getInstance("SHA256withRSA", "BC");
+			//TODO noSuchProviderException
+			Signature localSignature = Signature.getInstance("SHA256withRSA");
 			localSignature.initVerify(publickey);
 			localSignature.update(dataToVerify);
 			return localSignature.verify(this.signature);

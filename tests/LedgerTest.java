@@ -34,13 +34,16 @@ public class LedgerTest {
 		Entry aliceToSign = mempool.get(1);
 		Entry samToSign = mempool.get(2);
 		// sign txs and create a block.
-		l.createBlock();//Alice cannot sign for a UTXO that is still in the mempool, so we need to make a block first.
+		l.createBlock();//Alice cannot sign for a UTXO (genesis) that is still in the mempool, so we need to make a block first.
+		assertTrue(Entry.getMempool().size() == 2);
 		alice.sign(aliceToSign);
 		l.createBlock();//Sam cannot sign for a UTXO that is still in the mempool.
+		assertTrue(Entry.getMempool().size() == 1);
 		sam.sign(samToSign);
 		// have to sign all but the genesis.
 		l.createBlock();
 		assertTrue(l.getBlockchain().size() == 3);
+		assertTrue(Entry.getMempool().size() == 0);
 		assertTrue(l.calcBalance("Bob") == 3000);
 		assertTrue(l.calcBalance("Milo") == 1500);
 		assertTrue(l.calcBalance("Band") == 1500);
