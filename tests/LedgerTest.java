@@ -28,8 +28,8 @@ public class LedgerTest {
 		
 		assertNotNull(alice);
 		assertNotNull(sam);
-		alice.loadKeyPair("aliceprivate_key.pem", "alicepublic_key.pem");
-		sam.loadKeyPair("aliceprivate_key.pem", "alicepublic_key.pem");//fine for testing, ignore the semantics of this.
+		alice.loadKeyPair("Alice_keypair.ser");
+		sam.loadKeyPair("Sam_keypair.ser");//fine for testing, ignore the semantics of this.
 		List<Entry> mempool = Entry.getMempool();
 		Entry aliceToSign = mempool.get(1);
 		Entry samToSign = mempool.get(2);

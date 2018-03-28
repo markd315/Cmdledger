@@ -60,25 +60,25 @@ public class Ledger {
 	}
 
 	private List<Block> blockchain;
-
+	private List<Entry> addingInThisBlock;
+	
 	public void createBlock() {
-		List<Entry> validAdding = new ArrayList<Entry>();
+		addingInThisBlock = new ArrayList<Entry>();
 		for (Entry e : Entry.getMempool()) {
 			if (e.getInputs().size() == 0 && this.blockchain.size() == 0) {// Genesis.
-				List<Entry> singletx = new ArrayList<Entry>();
-				singletx.add(e);
-				Block genesis = new Block(singletx);
+				addingInThisBlock.add(e);
+				Block genesis = new Block(addingInThisBlock);
 				this.blockchain.add(genesis);
 			} else {
 				String person = this.lookupOutput(e.getInputs().get(0)).getName();
 				PublicKey pkToVerifyWith = Identity.lookupWithName(person).getPublicKey();
 				if (e.verifySignature(pkToVerifyWith)) {
 					//TODO anything else I need to check?
-					validAdding.add(e);//If that's all...
+					addingInThisBlock.add(e);//If that's all...
 				}
 			}
 		}
-		Block newBlock = new Block(validAdding);
+		Block newBlock = new Block(addingInThisBlock);
 		this.blockchain.add(newBlock);
 
 	}
@@ -272,12 +272,28 @@ public class Ledger {
 	}
 
 	Output lookupOutput(Input in) {
+		Output toReturn = null;
 		for (Entry e : this.getBlockchain()) {
 			if (e.getId().equals(in.getId())) {
-				return e.getOutputs().get(in.getIndex());
+				if(toReturn == null) {
+					toReturn = e.getOutputs().get(in.getIndex());
+				}
+				else {
+					System.err.println("Error: There are two entries with the same ID!");
+				}
+			}
+		}//We also have to check inside of addingInThisBlock, but we will give the established chain priority.
+		for (Entry e : this.addingInThisBlock) {
+			if (e.getId().equals(in.getId())) {
+				if(toReturn == null) {
+					toReturn = e.getOutputs().get(in.getIndex());
+				}
+				else {
+					System.err.println("Error: There are two entries with the same ID!");
+				}
 			}
 		}
-		return null;
+		return toReturn;
 	}
 
 	public void wipe() {

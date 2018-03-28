@@ -15,16 +15,12 @@ public class CmdLedger {
 			throws InvalidKeySpecException, NoSuchAlgorithmException, FileNotFoundException {
 		Ledger session = Ledger.getInstance();
 		Scanner in = new Scanner(System.in);
-		Identity alice = new Identity("Alice");
-		Identity sam = new Identity("Sam");
-		try {
-			alice.generateAndDumpKeys();
-			sam.generateAndDumpKeys();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
+		/*
+		 * Identity alice = new Identity("Alice"); Identity sam = new Identity("Sam");
+		 * try { alice.generateAndDumpKeys(); sam.generateAndDumpKeys(); } catch
+		 * (IOException e1) { // TODO Auto-generated catch block e1.printStackTrace(); }
+		 */
+
 		while (true) {
 			if (session.isInteractive()) {
 				System.out.println(
@@ -190,14 +186,14 @@ public class CmdLedger {
 				boolean found = false;
 				for (Identity i : list) {
 					if (i.getName().equals(accountname)) {
-						i.loadKeyPair(privkeyfile, pubkeyfile);
+						i.loadKeyPair(i.getName() + "_keypair.ser");
 						found = true;
 						break;
 					}
 				}
 				if (!found) {
 					Identity created = new Identity(accountname);
-					created.loadKeyPair(privkeyfile, pubkeyfile);
+					created.loadKeyPair(created.getName() + "_keypair.ser");
 				}
 				break;
 			}

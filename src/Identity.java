@@ -57,6 +57,10 @@ public class Identity {
 	}
 
 	public void sign(Entry e) throws Exception {
+		//TODO line throws IOOB
+		if(e.getInputs().size() == 0 && Ledger.getInstance().getBlockchain().size() == 0) {
+			return;//Genesis
+		}
 		Output toFindName = Ledger.getInstance().lookupOutput(e.getInputs().get(0));
 		String name = toFindName.getName();
 		if(!this.name.equalsIgnoreCase(name)) {
@@ -67,7 +71,9 @@ public class Identity {
 	}
 
 	public boolean verify(Entry e) throws Exception {
-		// TODO throw exception if verifying an entry that isn't ours.
+		if(e.getInputs().size() == 0 && Ledger.getInstance().getBlockchain().size() == 0) {
+			return true;//Genesis
+		}
 		Output toFindName = Ledger.getInstance().lookupOutput(e.getInputs().get(0));
 		String name = toFindName.getName();
 		if(!this.name.equalsIgnoreCase(name)) {
