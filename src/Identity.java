@@ -56,14 +56,24 @@ public class Identity {
 		return new Identity(n);
 	}
 
-	public void sign(Entry e) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,
-			SignatureException, IOException {
-		// TODO throw exception if signing an entry that isn't ours.
+	public void sign(Entry e) throws Exception {
+		Output toFindName = Ledger.getInstance().lookupOutput(e.getInputs().get(0));
+		String name = toFindName.getName();
+		if(!this.name.equalsIgnoreCase(name)) {
+			System.err.println("Not going to sign for someone elses transaction!");
+			return;
+		}
 		e.setSignature(this.getPrivateKey());
 	}
 
-	public boolean verify(Entry e) {
+	public boolean verify(Entry e) throws Exception {
 		// TODO throw exception if verifying an entry that isn't ours.
+		Output toFindName = Ledger.getInstance().lookupOutput(e.getInputs().get(0));
+		String name = toFindName.getName();
+		if(!this.name.equalsIgnoreCase(name)) {
+			System.err.println("Can't verify for someone elses transaction!");
+			return false;
+		}
 		return e.verifySignature(this.getPublicKey());
 	}
 
