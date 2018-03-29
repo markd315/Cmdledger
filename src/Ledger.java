@@ -72,7 +72,7 @@ public class Ledger {
 				String person = this.lookupOutput(e.getInputs().get(0)).getName();
 				PublicKey pkToVerifyWith = Identity.lookupWithName(person).getPublicKey();
 				if(pkToVerifyWith == null) {
-					System.err.println("Keypair not loaded into memory!");
+					//System.err.println("Keypair not loaded into memory!");
 					continue;
 				}
 				if (e.verifySignature(pkToVerifyWith)) {

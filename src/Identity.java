@@ -150,10 +150,16 @@ public class Identity {
 	}
 
 	public PrivateKey getPrivateKey() {
+		if(keys == null) {
+			return null;
+		}
 		return keys.getPrivate();
 	}
 
 	public PublicKey getPublicKey() {
+		if(keys == null) {
+			return null;
+		}
 		return keys.getPublic();
 	}
 

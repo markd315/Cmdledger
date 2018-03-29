@@ -228,17 +228,28 @@ public class CmdLedger {
 				String accountname = accAndFileName[0].trim();
 				String fileName = accAndFileName[1].trim();
 				List<Identity> list = Identity.getPeople();
+				Identity id = null;
 				boolean found = false;
 				for (Identity i : list) {
 					if (i.getName().equals(accountname)) {
 						i.loadKeyPair(fileName);
 						found = true;
+						id = i;
 						break;
 					}
 				}
 				if (!found) {
 					Identity created = new Identity(accountname);
-					created.loadKeyPair(created.getName() + "_keypair.ser");
+					created.loadKeyPair(fileName);
+					id = created;
+				}
+				//Now that we've loaded it, we have to try to sign all the TX in the mempool.
+				for(Entry e : Entry.getMempool()) {
+					try {
+						id.sign(e);
+					} catch (Exception e1) {
+						//Do nothing. We only want to sign the ones that will sign so we WILL get these.
+					}
 				}
 				break;
 			}
