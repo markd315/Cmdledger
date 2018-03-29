@@ -19,11 +19,6 @@ public class LedgerTest {
 
 	@Test
 	public void canLoadAndDumpTxFromFile() throws Exception {
-		CmdLedger.loadFromFile(l, "testinputs.txt");
-		assertTrue(Entry.getMempool().size() == 0);
-		assertTrue(l.getBlockchain().size() == 3);
-		// Alice and Sam need to sign txs.
-		//TODO Alice and Sam transactions weirdly have no inputs. Double-spend?
 		Identity alice=null, sam=null, milo=null;//Just yank their references from the static list.
 		alice = Identity.lookupWithName("Alice");
 		sam = Identity.lookupWithName("Sam");
@@ -34,6 +29,11 @@ public class LedgerTest {
 		alice.loadKeyPair("Alice_keypair.ser");
 		sam.loadKeyPair("Sam_keypair.ser");//fine for testing, ignore the semantics of this.
 		milo.generateAndDumpKeys();//Not going to load one for him to prove that we can generate a new one.
+		CmdLedger.loadFromFile(l, "testinputs.txt");
+		assertTrue(Entry.getMempool().size() == 0);
+		assertTrue(l.getBlockchain().size() == 3);
+		// Alice and Sam need to sign txs.
+		//TODO Alice and Sam transactions weirdly have no inputs. Double-spend?
 		assertTrue(l.calcBalance("Bob") == 3000);
 		assertTrue(l.calcBalance("Milo") == 1500);
 		assertTrue(l.calcBalance("Band") == 1500);
@@ -66,14 +66,6 @@ public class LedgerTest {
 		assertTrue(Entry.getMempool().size() == 0);
 	}
 
-	@Test
-	public void testWillAddWellFormattedTx() throws Exception {
-		l.addTransaction("root; 0; ; 1; (Mark, 1000)");
-		l.addTransaction("new; 1; (root, 0); 1; (Matt, 1000)");
-		l.addTransaction("split; 1; (new, 0); 2; (Mark, 500)(Mateo, 500)");
-		assertTrue(Entry.getMempool().size() == 3);
-	}
-
 	//TODO suspended for further semantic consideration
 	/*@Test
 	public void testWontAddDoubleSpendTx() throws Exception {
@@ -97,10 +89,11 @@ public class LedgerTest {
 	@Test
 	public void testWontAddUnbalancedTx() throws Exception {
 		l.addTransaction("root; 0; ; 1; (Mark, 1000)");
-		l.addTransaction("new; 1; (root, 0); 1; (Matt, 1000)");
-		l.addTransaction("split; 1; (new, 0); 2; (Mark, 1000)(Mateo, 1000)");
-		l.addTransaction("splitter; 1; (new, 0); 2; (Mark, 499)(Mateo, 499)");
-		assertTrue(Entry.getMempool().size() == 2);
+		l.createBlock();
+		l.addTransaction("split; 1; (root, 0); 2; (Mark, 1000)(Mateo, 1000)");
+		assertTrue(Entry.getMempool().size() == 0);
+		l.addTransaction("splitter; 1; (root, 0); 2; (Mark, 499)(Mateo, 499)");
+		assertTrue(Entry.getMempool().size() == 0);
 	}
 
 }
