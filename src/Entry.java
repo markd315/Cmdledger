@@ -1,4 +1,5 @@
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.security.InvalidKeyException;
@@ -26,10 +27,10 @@ public class Entry {
 
 	public Entry(Ledger parent, List<Input> ins, List<Output> outs) {
 		this.signature = null; // to be signed later.
-		if(ins == null) {
+		if (ins == null) {
 			ins = new ArrayList<Input>();
 		}
-		if(outs == null) {
+		if (outs == null) {
 			outs = new ArrayList<Output>();
 		}
 		this.inputs = ins;
@@ -86,7 +87,7 @@ public class Entry {
 	}
 
 	public boolean verifySignature(PublicKey publickey) {
-		if(this.signature == null) {
+		if (this.signature == null) {
 			return false;
 		}
 		try {
@@ -96,7 +97,7 @@ public class Entry {
 			writer.writeObject(this.outputs);
 			writer.writeObject(this.id);
 			byte[] dataToVerify = baos.toByteArray();
-			//TODO noSuchProviderException
+			// TODO noSuchProviderException
 			Signature localSignature = Signature.getInstance("SHA256withRSA");
 			localSignature.initVerify(publickey);
 			localSignature.update(dataToVerify);
@@ -122,7 +123,19 @@ public class Entry {
 		for (int i = 0; i < outputs.size(); i++) {
 			ret += "(" + outputs.get(i).getName() + ", " + outputs.get(i).getAmount() + ")";
 		}
-		ret+=this.signature;
+		try {
+			if (this.signature != null) {
+				ret+="\n";//Signatures and transactions are delimited by newline.
+				for (byte b : this.signature) {
+					ret += b+" ";
+				}
+			}else {
+				ret+="null";
+			}
+		} catch (Exception e) {
+			System.err.println("Error printing signature to disk.");
+		}
+
 		return ret;
 	}
 
