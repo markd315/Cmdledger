@@ -115,10 +115,6 @@ public class CmdLedger {
 					System.out.println("Which filename (full extension)");
 					cmd += " " + in.nextLine();
 					break;
-				case "o":
-					Block b = session.createBlock();
-					System.out.println(b);
-					break;
 				default:
 					if (session.isVerbose()) {
 						System.out.println("Executing command " + cmd);
@@ -142,6 +138,10 @@ public class CmdLedger {
 					System.out.println("Mempool wiping!");
 				}
 				Entry.clearMempool();
+			}
+			if(cmd.equalsIgnoreCase("o")) {
+				Block b = session.createBlock();
+				System.out.println(b);
 			}
 			if (cmd.equalsIgnoreCase("h")) {
 				System.out.println(
@@ -226,13 +226,12 @@ public class CmdLedger {
 			case 'r':
 				String[] accAndFileName = remainingCmd.split(" ");
 				String accountname = accAndFileName[0].trim();
-				String privkeyfile = accAndFileName[1].trim();
-				String pubkeyfile = accAndFileName[2].trim();
+				String fileName = accAndFileName[1].trim();
 				List<Identity> list = Identity.getPeople();
 				boolean found = false;
 				for (Identity i : list) {
 					if (i.getName().equals(accountname)) {
-						i.loadKeyPair(i.getName() + "_keypair.ser");
+						i.loadKeyPair(fileName);
 						found = true;
 						break;
 					}
@@ -254,7 +253,6 @@ public class CmdLedger {
 		
 		while (fi.hasNextLine()) {
 			session.addTransaction(fi.nextLine());
-			session.createBlock();
 		}
 		if (session.isVerbose()) {
 			System.out.println("File load complete!");

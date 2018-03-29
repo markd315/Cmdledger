@@ -18,6 +18,12 @@ public class Block {//contains multiple Entry, included in a Ledger blockchain.
 	public Ledger getParentLedger() {
 		return this.parent;
 	}
-	
+	public String toString() {
+		String ret = "";
+		for(Entry e : this.txs) {
+			ret+=e.toStringNoSig();
+		}
+		return ret;
+	}
 	
 }

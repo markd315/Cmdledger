@@ -281,13 +281,14 @@ public class Ledger {
 			System.out.print("Transaction rejected, reason: ");
 			System.err.println("Empty output space.");
 			return;
-		} else if (e.sumOfIns() != e.sumOfOuts()) {
+		} /*else if (e.sumOfIns() != e.sumOfOuts()) {
 			if (blockchain.size() > 0 || Entry.getMempool().size() > 0) {
 				System.out.print("Transaction rejected, reason: ");
 				System.err.println("Invalid spend or destruct of funds.");
 				return;
 			}
-		}
+		}*/
+		//Uncomment previous line if you want the mempool to demand a transaction's inputs be in a block before it is added.
 		Entry.addToMempool(e);
 	}
 
