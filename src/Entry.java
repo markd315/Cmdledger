@@ -90,6 +90,9 @@ public class Entry {
 		if (this.signature == null) {
 			return false;
 		}
+		if(publickey == null) {
+			return false;
+		}
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ObjectOutputStream writer = new ObjectOutputStream(baos);

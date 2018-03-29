@@ -88,7 +88,6 @@ public class CmdLedger {
 							System.out.println(
 									"Please note that unbalanced transactions of this type are not usually allowed.");
 						}
-						// TODO MAKE SURE we allow a digital signature along with the tx.
 					}
 					System.out.println("Which transaction name?");
 					cmd += " " + in.nextLine() + "; ";
@@ -207,11 +206,20 @@ public class CmdLedger {
 				break;
 			case 'c':
 				try {
-					Entry e = session.lookupWithId(remainingCmd);
-					Output o = session.lookupOutput(e.getInputs().get(0));
+					List<Entry> mem = Entry.getMempool();
+					Entry found = null;
+					for(Entry e : mem) {
+						if(e.getId().equalsIgnoreCase(remainingCmd)) {
+							found = e;
+						}
+					}
+					if(found == null) {
+						System.err.println("No transaction with that ID found");
+					}
+					Output o = session.lookupOutput(found.getInputs().get(0));
 					Identity i = Identity.lookupWithName(o.getName());
 					PublicKey pubkey = i.getPublicKey();
-					if (e.verifySignature(pubkey)) {// Just verify the signature.
+					if (found.verifySignature(pubkey)) {// Just verify the signature.
 						System.out.println("OK");
 					} else {
 						System.out.println("Bad");
