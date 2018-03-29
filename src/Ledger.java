@@ -325,84 +325,90 @@ public class Ledger {
 		return null;
 	}
 
-	public void addSignedTransaction(String nextLine, String nextLine2) {//For signed transactions.
+	public void addSignedTransaction(String nextLine, String nextLine2) {// For signed transactions.
 		// Break the String into 5 parts by split;
-				String[] split = nextLine.split(";");
-				if (split.length != 5) {
-					System.err.println("Unable to parse into the 5 arguments");
-					return;
-				}
-				for (int i = 0; i < split.length; i++) {
-					if (split[i].length() > 0)
-						split[i] = split[i].trim();
-				}
-				int inputSize = Integer.parseInt(split[1]);
-				List<Input> ins = new ArrayList<Input>();
-				if (inputSize > 0) {
-					String temp = split[2].substring(1, split[2].length() - 1);
-					String withoutParentheses = temp.replaceAll("\\)", ";");
-					withoutParentheses = withoutParentheses.replaceAll("\\(", "");
-					String[] inputArray = {};
+		String[] split = nextLine.split(";");
+		if (split.length != 5) {
+			System.err.println("Unable to parse into the 5 arguments");
+			return;
+		}
+		for (int i = 0; i < split.length; i++) {
+			if (split[i].length() > 0)
+				split[i] = split[i].trim();
+		}
+		int inputSize = Integer.parseInt(split[1]);
+		List<Input> ins = new ArrayList<Input>();
+		if (inputSize > 0) {
+			String temp = split[2].substring(1, split[2].length() - 1);
+			String withoutParentheses = temp.replaceAll("\\)", ";");
+			withoutParentheses = withoutParentheses.replaceAll("\\(", "");
+			String[] inputArray = {};
 
-					if (withoutParentheses.contains(";")) {
-						inputArray = withoutParentheses.split(";");
-					} else {
-						inputArray = new String[1];
-						inputArray[0] = withoutParentheses;
-					}
-					// TESTCMD: t newt; 1; (root, 0); 2; (Sam, 2000)(Bob, 3000)
-					// We want to remove the leading ( to be able to split this string.
-					for (String s : inputArray) {
-						String[] inSplit = s.split(",");
-						String txid = inSplit[0].trim();
-						int index = Integer.parseInt(inSplit[1].trim());
-						ins.add(new Input(txid, index));
-					}
-				}
-				if (ins.size() != inputSize) {
-					System.err.println("Invalid inputs!");
-					return;
-				}
+			if (withoutParentheses.contains(";")) {
+				inputArray = withoutParentheses.split(";");
+			} else {
+				inputArray = new String[1];
+				inputArray[0] = withoutParentheses;
+			}
+			// TESTCMD: t newt; 1; (root, 0); 2; (Sam, 2000)(Bob, 3000)
+			// We want to remove the leading ( to be able to split this string.
+			for (String s : inputArray) {
+				String[] inSplit = s.split(",");
+				String txid = inSplit[0].trim();
+				int index = Integer.parseInt(inSplit[1].trim());
+				ins.add(new Input(txid, index));
+			}
+		}
+		if (ins.size() != inputSize) {
+			System.err.println("Invalid inputs!");
+			return;
+		}
 
-				int outputSize = Integer.parseInt(split[3]);
-				List<Output> outs = new ArrayList<Output>();
-				if (outputSize > 0) {
-					String[] outputArray = {};
-					String temp = split[4].substring(1, split[4].length() - 1);
-					String withoutParentheses = temp.replaceAll("\\)", ";");
-					withoutParentheses = withoutParentheses.replaceAll("\\(", "");
+		int outputSize = Integer.parseInt(split[3]);
+		List<Output> outs = new ArrayList<Output>();
+		if (outputSize > 0) {
+			String[] outputArray = {};
+			String temp = split[4].substring(1, split[4].length() - 1);
+			String withoutParentheses = temp.replaceAll("\\)", ";");
+			withoutParentheses = withoutParentheses.replaceAll("\\(", "");
 
-					if (withoutParentheses.contains(";")) {
-						outputArray = withoutParentheses.split(";");
-					} else {
-						outputArray = new String[1];
-						outputArray[0] = withoutParentheses;
-					}
-					// We want to remove the trailing ) to be able to split this string.
-					for (String s : outputArray) {
-						String[] outSplit = s.split(",");
-						String name = outSplit[0].trim();
-						int amount = Integer.parseInt(outSplit[1].trim());
-						outs.add(new Output(name, amount, null)); // We need to update the entry from Null.
-					}
-				}
-				if (outs.size() != outputSize) {
-					System.err.println("Invalid outputs!");
-					return;
-				}
-				Entry e = new Entry(this, ins, outs);
-				for (Output o : e.getOutputs()) {
-					o.setEntry(e);
-				}
-				e.setTxID(split[0]);
-				String[] bytesToParse = nextLine2.split(" ");
-				byte[] signature = new byte[bytesToParse.length];
-				for(int i=0; i<signature.length; i++) {
-					signature[i] = Byte.valueOf(bytesToParse[i]);
-				}
-				e.reloadSignature(signature);
-				this.addTransaction(e);
-				return;
+			if (withoutParentheses.contains(";")) {
+				outputArray = withoutParentheses.split(";");
+			} else {
+				outputArray = new String[1];
+				outputArray[0] = withoutParentheses;
+			}
+			// We want to remove the trailing ) to be able to split this string.
+			for (String s : outputArray) {
+				String[] outSplit = s.split(",");
+				String name = outSplit[0].trim();
+				int amount = Integer.parseInt(outSplit[1].trim());
+				outs.add(new Output(name, amount, null)); // We need to update the entry from Null.
+			}
+		}
+		if (outs.size() != outputSize) {
+			System.err.println("Invalid outputs!");
+			return;
+		}
+		Entry e = new Entry(this, ins, outs);
+		for (Output o : e.getOutputs()) {
+			o.setEntry(e);
+		}
+		e.setTxID(split[0]);
+		byte[] signature;
+		if (nextLine2.equalsIgnoreCase("null")) {
+			signature = null;
+		} else {
+			String[] bytesToParse = nextLine2.split(" ");
+			signature = new byte[bytesToParse.length];
+			for (int i = 0; i < signature.length; i++) {
+				signature[i] = Byte.valueOf(bytesToParse[i]);
+			}
+		}
+
+		e.reloadSignature(signature);
+		this.addTransaction(e);
+		return;
 	}
 
 }

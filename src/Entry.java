@@ -130,7 +130,7 @@ public class Entry {
 					ret += b+" ";
 				}
 			}else {
-				ret+="null";
+				ret+="\nnull";
 			}
 		} catch (Exception e) {
 			System.err.println("Error printing signature to disk.");
