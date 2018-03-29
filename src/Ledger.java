@@ -239,18 +239,8 @@ public class Ledger {
 			o.setEntry(e);
 		}
 		e.setTxID(split[0]);
-		byte[] signature = recombineString(split, 5).getBytes();
-		e.reloadSignature(signature);
 		this.addTransaction(e);
 		return;
-	}
-
-	private String recombineString(String[] split, int i) {
-		String ret = "";
-		for (; i < split.length; i++) {
-			ret += split[i];
-		}
-		return ret;
 	}
 
 	// This needs to handle geneses and check them to see if they are the first
