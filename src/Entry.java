@@ -193,4 +193,21 @@ public class Entry {
 	public void reloadSignature(byte[] signature) {
 		this.signature = signature;
 	}
+
+	public String toStringNoSig() {
+		String ret = id + "; ";
+		ret += inputs.size() + "; ";
+		for (int i = 0; i < inputs.size(); i++) {
+			ret += "(" + inputs.get(i).getId() + ", " + inputs.get(i).getIndex() + ")";
+		}
+		ret += "; " + outputs.size() + "; ";
+		for (int i = 0; i < outputs.size(); i++) {
+			ret += "(" + outputs.get(i).getName() + ", " + outputs.get(i).getAmount() + ")";
+		}
+		return ret;
+	}
+
+	public static void clearMempool() {
+		mempool = new ArrayList<Entry>();
+	}
 }

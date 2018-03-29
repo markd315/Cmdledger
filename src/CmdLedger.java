@@ -15,6 +15,7 @@ public class CmdLedger {
 			throws InvalidKeySpecException, NoSuchAlgorithmException, FileNotFoundException {
 		Ledger session = Ledger.getInstance();
 		Scanner in = new Scanner(System.in);
+		/*
 		// For initing some keys.
 
 		Identity alice = new Identity("Alice");
@@ -55,10 +56,13 @@ public class CmdLedger {
 		sam.sign(ex);
 		session.createBlock();
 		dumpFile(session, "testinputs.txt");
+		
+		
 		}
 		catch(Exception e) {
-			System.err.println("fuck...");
-		}
+			System.err.println("error setting up temp keys..");
+		}*/
+		
 		while (true) {
 			if (session.isInteractive()) {
 				System.out.println(
@@ -111,6 +115,10 @@ public class CmdLedger {
 					System.out.println("Which filename (full extension)");
 					cmd += " " + in.nextLine();
 					break;
+				case "o":
+					Block b = session.createBlock();
+					System.out.println(b);
+					break;
 				default:
 					if (session.isVerbose()) {
 						System.out.println("Executing command " + cmd);
@@ -126,13 +134,14 @@ public class CmdLedger {
 			}
 			// check for exit.
 			if (cmd.equalsIgnoreCase("p")) {
-				System.out.println(session);
+				for(Entry e : Entry.getMempool())
+					System.out.println(e.toStringNoSig());
 			} // Print ledger
 			if (cmd.equalsIgnoreCase("w")) {
 				if (session.isVerbose()) {
-					System.out.println("Session wiping!");
+					System.out.println("Mempool wiping!");
 				}
-				session.wipe();
+				Entry.clearMempool();
 			}
 			if (cmd.equalsIgnoreCase("h")) {
 				System.out.println(
@@ -148,11 +157,11 @@ public class CmdLedger {
 								+ "\r\n"
 								+ "[V]erbose: Toggle verbose mode. Start in non-verbose mode. In verbose mode, print additional diagnostic information as you wish. At all times, output each transaction number as it is read in, followed by a colon, a space, and the result (good or bad). \r\n"
 								+ "\r\n"
-								+ "[B]alance:  Supply username:  (e.g. Alice).  This command prints the current balance of a user."
+								+ "[B]alance:  Supply username:  (e.g. Alice).  This command prints the current balance of a user.\r\n"
 								+ "\r\n"
-								+ "[O]utput:  collect all correctly signed transactions that have not been output in a previous transaction block and output them as a transaction block.  This outputs the current block only."
+								+ "[O]utput:  collect all correctly signed transactions that have not been output in a previous transaction block and output them as a transaction block.  This outputs the current block only.\r\n"
 								+ "\r\n"
-								+ "[R]ead:  supply <account name> <keyfilename>. <account name is the name of the account associated with the key ."
+								+ "[R]ead:  supply <account name> <keyfilename>. <account name is the name of the account associated with the key.\r\n"
 								+ "\r\n"
 								+ "[C]heck:  Supply <transactionID>:  The signature of the signed transaction (in the two-line format given above) shall be checked. Output OK to stdout if good, else output Bad to stdout. If bad, output additional diagnostic information to stderr.");
 			}
@@ -172,7 +181,8 @@ public class CmdLedger {
 			switch (firstChar) {
 			case 'f':
 				try {
-					loadFromFile(session, remainingCmd);
+					loadMempoolFromFile(session, remainingCmd);
+					//loadFromFile(session, remainingCmd);
 				} catch (FileNotFoundException e) {
 					System.err.println("Error: file " + remainingCmd.trim() + " cannot be opened for reading");
 				}
@@ -189,13 +199,11 @@ public class CmdLedger {
 				break;
 			case 'd':
 				try {
-					dumpFile(session, remainingCmd);
+					dumpMempool(session, remainingCmd);
+					//dumpFile(session, remainingCmd);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				break;
-			case 'o':
-				session.createBlock();
 				break;
 			case 'c':
 				try {
@@ -237,6 +245,32 @@ public class CmdLedger {
 			}
 			// execute library command.
 
+		}
+	}
+
+	private static void loadMempoolFromFile(Ledger session, String remainingCmd) throws FileNotFoundException {
+		session.wipe();
+		Scanner fi = new Scanner(new File(remainingCmd));
+		
+		while (fi.hasNextLine()) {
+			session.addTransaction(fi.nextLine());
+			session.createBlock();
+		}
+		if (session.isVerbose()) {
+			System.out.println("File load complete!");
+		}
+	}
+
+	private static void dumpMempool(Ledger session, String remainingCmd) throws IOException {
+		FileOutputStream fs = new FileOutputStream(new File(remainingCmd.trim()));
+		for (Entry e : Entry.getMempool()) {
+			fs.write(e.toStringNoSig().getBytes());
+			fs.write("\n".getBytes());
+		}
+		fs.flush();
+		fs.close();
+		if (session.isVerbose()) {
+			System.out.println("File write complete!");
 		}
 	}
 

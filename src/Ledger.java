@@ -62,7 +62,7 @@ public class Ledger {
 	private List<Block> blockchain;
 	private List<Entry> addingInThisBlock;
 
-	public void createBlock() {
+	public Block createBlock() {
 		addingInThisBlock = new ArrayList<Entry>();
 		for (Entry e : Entry.getMempool()) {
 			if (e.getInputs().size() == 0 && this.blockchain.size() == 0) {// Genesis.
@@ -88,6 +88,7 @@ public class Ledger {
 		addingInThisBlock = new ArrayList<Entry>(); // Drop this reference and start over for next time this method is
 													// called.
 		this.blockchain.add(newBlock);
+		return newBlock;
 
 	}
 
