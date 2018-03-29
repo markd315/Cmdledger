@@ -71,6 +71,10 @@ public class Ledger {
 			} else {
 				String person = this.lookupOutput(e.getInputs().get(0)).getName();
 				PublicKey pkToVerifyWith = Identity.lookupWithName(person).getPublicKey();
+				if(pkToVerifyWith == null) {
+					System.err.println("Keypair not loaded into memory!");
+					continue;
+				}
 				if (e.verifySignature(pkToVerifyWith)) {
 					addingInThisBlock.add(e);// If that's all I need to check...
 				}
@@ -191,8 +195,6 @@ public class Ledger {
 				inputArray = new String[1];
 				inputArray[0] = withoutParentheses;
 			}
-			// TESTCMD: t newt; 1; (root, 0); 2; (Sam, 2000)(Bob, 3000)
-			// We want to remove the leading ( to be able to split this string.
 			for (String s : inputArray) {
 				String[] inSplit = s.split(",");
 				String txid = inSplit[0].trim();
@@ -277,11 +279,15 @@ public class Ledger {
 		if (e.sumOfOuts() == 0) {
 			System.out.print("Transaction rejected, reason: ");
 			System.err.println("Empty output space.");
-		} else if (e.sumOfIns() != e.sumOfOuts() && blockchain.size() > 0) {
-			System.out.print("Transaction rejected, reason: ");
-			System.err.println("Invalid spend or destruct of funds.");
-		} else
-			Entry.addToMempool(e);
+			return;
+		} else if (e.sumOfIns() != e.sumOfOuts()) {
+			if (blockchain.size() > 0 || Entry.getMempool().size() > 0) {
+				System.out.print("Transaction rejected, reason: ");
+				System.err.println("Invalid spend or destruct of funds.");
+				return;
+			}
+		}
+		Entry.addToMempool(e);
 	}
 
 	Output lookupOutput(Input in) {

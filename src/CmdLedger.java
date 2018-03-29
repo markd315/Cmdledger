@@ -260,6 +260,7 @@ public class CmdLedger {
 		
 		while (fi.hasNextLine()) {
 			session.addSignedTransaction(fi.nextLine(), fi.nextLine());
+			session.createBlock();
 		}
 		if (session.isVerbose()) {
 			System.out.println("File load complete!");
