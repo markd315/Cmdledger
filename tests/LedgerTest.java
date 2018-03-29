@@ -86,7 +86,7 @@ public class LedgerTest {
 		assertTrue(l.calcBalance("Mateo") == 0);
 	}*/
 
-	@Test
+	/*@Test
 	public void testWontAddUnbalancedTx() throws Exception {
 		l.addTransaction("root; 0; ; 1; (Mark, 1000)");
 		l.createBlock();
@@ -94,6 +94,6 @@ public class LedgerTest {
 		assertTrue(Entry.getMempool().size() == 0);
 		l.addTransaction("splitter; 1; (root, 0); 2; (Mark, 499)(Mateo, 499)");
 		assertTrue(Entry.getMempool().size() == 0);
-	}
+	}*/
 
 }
