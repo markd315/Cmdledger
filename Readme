@@ -23,23 +23,23 @@ For more help or to split commands across lines, recieving prompts: try toggling
 #relevant issues this project addresses.
 How a Bitcoin Transaction works:
 
-Whatâ€™s a Transaction in Bitcoin?
+What's a Transaction in Bitcoin?
 
-The act of â€œspendingâ€� happens when a user digitally signs a transaction that transfers value from a previous transaction (an unspent transaction output, or UTXO) to a new owner.  When a wallet has received bitcoin, the wallet has detected that a UTXO can be spent using the one of the keys controlled by that wallet.  A userâ€™s bitcoin balance is the sum of all these UTXOs scattered on the blockchain.  The wallet calculates the balance by scanning and aggregating the total value.  Transaction outputs are indivisible chunks of bitcoin currency.  An unspent output can only be consumed in its entirety by a transaction, so if you need change, then a transaction must produce a separate UTXO for change, so that all the UTXOs sum to the amount of the original value of the input.  Most bitcoin transactions generate change. Once a UTXO has been used as input to another transaction, it has been spent and is no longer a UTXO. 
+The abstraction of spending happens when a user digitally signs a transaction that transfers value from a previous transaction (an unspent transaction output, or UTXO) to a new owner.  When a wallet has received bitcoin, the wallet has detected that a UTXO can be spent using the one of the keys controlled by that wallet.  A userâ€™s bitcoin balance is the sum of all these UTXOs scattered on the blockchain.  The wallet calculates the balance by scanning and aggregating the total value.  Transaction outputs are indivisible chunks of bitcoin currency.  An unspent output can only be consumed in its entirety by a transaction, so if you need change, then a transaction must produce a separate UTXO for change, so that all the UTXOs sum to the amount of the original value of the input.  Most bitcoin transactions generate change. Once a UTXO has been used as input to another transaction, it has been spent and is no longer a UTXO. 
 
 Parts of a Bitcoin Transaction: Inputs, Outputs
 
-Inputs â€“ What you are spending â€“ (Debit)
+Inputs: "What you are spending" (Debit)
 Transaction inputs reference previous transaction outputs and identify which UTXO is consumed and provide proof of ownership.  To build a transaction, the wallet selects from the UTXOs it controls with enough value.  
 
-Outputs â€“ the Result of your transaction â€“ (Credit)
-UTXOs â€œUnspent Transaction Outputsâ€� are the fundamental building block of a transaction output. Transaction outputs are pairs that name the account (key) and the amount from the transaction inputs that are to be credited to the named account. 
+Outputs: "The Result of your transaction" (Credit)
+UTXOs (Unspent Transaction Outputs) are the fundamental building block of a transaction output. Transaction outputs are pairs that name the account (key) and the amount from the transaction inputs that are to be credited to the named account. 
 
 A transaction that does not provide proof of authorization to spend a UTXO listed as input, or that lists an invalid UTXO is not accepted. All accepted transactions are stored on the blockchain.  
 
 The menu contains:
 
-[F]ile:  Supply filename:<infilename>.  Read in a file of transactions. Any invalid transaction shall be identified with an error message to stderr, but not stored. Print an error message to stderr if the input file named cannot be opened. The message shall be â€œError: file <infilename> cannot be opened for readingâ€� on a single line, where <infilename> is the name provided as additional command input.  
+[F]ile:  Supply filename:<infilename>.  Read in a file of transactions. Any invalid transaction shall be identified with an error message to stderr, but not stored. Print an error message to stderr if the input file named cannot be opened. The message shall be â€œError: file <infilename> cannot be opened for reading on a single line, where <infilename> is the name provided as additional command input.  
 
 [T]ransaction: Supply Transaction:<see format below>   Read in a single transaction in the format shown below.  It shall be checked for validity against the ledger, and added if it is valid. If it is not valid, then do not add it to the ledger and print a message to stderr with the transaction number followed by a colon, a space, and the reason it is invalid on a single line.
 
@@ -49,13 +49,13 @@ The menu contains:
 
 [H]elp:  Command Summary
 
-[D]ump:  Supply filename:<outfilename>.  Dump ledger to the named file. Print an error message to stderr if the output file named cannot be opened. The message shall be â€œError: file <outfilename> cannot be opened for writingâ€� on a single line, where <outfilename> is the name provided as additional command input. 
+[D]ump:  Supply filename:<outfilename>.  Dump ledger to the named file. Print an error message to stderr if the output file named cannot be opened. The message shall be Error: file <outfilename> cannot be opened for writing on a single line, where <outfilename> is the name provided as additional command input. 
 
 [W]ipe:  Wipe the entire ledger to start fresh.
 
 [I]nteractive: Toggle interactive mode. Start in non-interactive mode, where no command prompts are printed. Print command prompts and prompts for additional input in interactive mode, starting immediately (i.e., print a command prompt following the I command).
 
-[V]erbose: Toggle verbose mode. Start in non-verbose mode. In verbose mode, print additional diagnostic information as you wish. At all times, output each transaction number as it is read in, followed by a colon, a space, and the result (â€œgoodâ€� or â€œbadâ€�). 
+[V]erbose: Toggle verbose mode. Start in non-verbose mode. In verbose mode, print additional diagnostic information as you wish. At all times, output each transaction number as it is read in, followed by a colon, a space, and the result.
 
 [B]alance:  Supply username:  (e.g. Alice).  This command prints the current balance of a user.    
 
