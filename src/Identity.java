@@ -60,7 +60,6 @@ public class Identity {
 		if(e.getInputs().size() == 0 && Ledger.getInstance().getBlockchain().size() == 0) {
 			return;//Genesis
 		}
-		//TODO toFindName gets set NULL.
 		Input toLookup = e.getInputs().get(0);
 		Output toFindName = Ledger.getInstance().lookupOutput(toLookup);
 		String name = toFindName.getName();

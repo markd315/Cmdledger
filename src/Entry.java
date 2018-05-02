@@ -25,7 +25,7 @@ public class Entry {
 		return mempool;
 	}
 
-	public Entry(Ledger parent, List<Input> ins, List<Output> outs) {
+	public Entry(Ledger parent, List<Input> ins, List<Output> outs) throws IllegalArgumentException{
 		this.signature = null; // to be signed later.
 		if (ins == null) {
 			ins = new ArrayList<Input>();

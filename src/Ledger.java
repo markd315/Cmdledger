@@ -54,6 +54,17 @@ public class Ledger {
 		}
 		return ret;
 	}
+	
+	public List<Entry> getBlockchainAndMempool() {
+		List<Entry> ret = new ArrayList<Entry>();
+		for (Block b : blockchain) {
+			ret.addAll(b.getAllEntries());
+		}
+		for (Entry e : Entry.getMempool()) {
+			ret.add(e);
+		}
+		return ret;
+	}
 
 	public List<Block> getBlockchainAsBlocks() {
 		return blockchain;
@@ -234,7 +245,14 @@ public class Ledger {
 			System.err.println("Invalid outputs!");
 			return;
 		}
-		Entry e = new Entry(this, ins, outs);
+		Entry e = null;
+		try {
+		e = new Entry(this, ins, outs);
+		}
+		catch(IllegalArgumentException exe) {
+			System.err.println("Not all inputs owned by the same user:" + exe);
+			return;
+		}
 		for (Output o : e.getOutputs()) {
 			o.setEntry(e);
 		}
@@ -284,7 +302,7 @@ public class Ledger {
 
 	Output lookupOutput(Input in) {
 		Output toReturn = null;
-		for (Entry e : this.getBlockchain()) {
+		for (Entry e : this.getBlockchainAndMempool()) {
 			if (e.getId().equals(in.getId())) {
 				if (toReturn == null) {
 					toReturn = e.getOutputs().get(in.getIndex());
